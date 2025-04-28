@@ -36,9 +36,16 @@ deleteProductBtn.addEventListener('click', () => {
         const confirmDelete = confirm(`Are you sure you want to delete ${selectedRows.length} product(s)?`);
         if (confirmDelete) {
             const products = JSON.parse(localStorage.getItem('products')) || [];
-            const updatedProducts = products.filter((product, index) => {
-                const row = inventoryTable.rows[index];
-                return !row.querySelector('.selectRow').checked;
+            const updatedProducts = products.filter((product) => {
+                // Check if the product is not selected for deletion
+                return !Array.from(selectedRows).some((row) => {
+                    const rowElement = row.closest('tr');
+                    return (
+                        rowElement.cells[1].textContent === product.productName &&
+                        rowElement.cells[2].textContent === product.productQuantity &&
+                        rowElement.cells[3].textContent === product.productPrice
+                    );
+                });
             });
 
             // Update localStorage and reload the table
@@ -53,6 +60,6 @@ deleteProductBtn.addEventListener('click', () => {
 // Enable/Disable buttons based on selection
 document.addEventListener('change', () => {
     const selectedRows = document.querySelectorAll('.selectRow:checked');
-    deleteProductBtn.disabled = selectedRows.length === 0;
-    editProductBtn.disabled = selectedRows.length !== 1; // Enable Edit only if one row is selected
+    deleteProductBtn.disabled = selectedRows.length === 0; // Enable Delete if at least one row is selected
+    editProductBtn.disabled = selectedRows.length !== 1;  // Enable Edit only if exactly one row is selected
 });

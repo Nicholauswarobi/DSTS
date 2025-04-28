@@ -85,20 +85,13 @@
                 filteredProducts.forEach((product) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td><input type="radio" name="selectRow"></td>
+                        <td><input type="checkbox" class="selectRow"></td>
                         <td>${product.productName}</td>
                         <td>${product.productQuantity}</td>
                         <td>${product.productPrice}</td>
                         <td>${product.totalValue}</td>
                         <td>${product.dateAdded}</td>
                     `;
-
-                    // Add event listener for row selection
-                    row.querySelector('input[type="radio"]').addEventListener('change', () => {
-                        selectedRow = row;
-                        editProductBtn.disabled = false; // Enable Edit button
-                        deleteProductBtn.disabled = false; // Enable Delete button
-                    });
 
                     inventoryTable.appendChild(row);
                 });
