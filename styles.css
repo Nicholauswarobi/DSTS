@@ -200,3 +200,33 @@ table td {
 table td input[type="radio"] {
     cursor: pointer;
 }
+
+/* Edit Button */
+button#editProductBtn {
+    background-color: #ffc107; /* Yellow */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button#editProductBtn:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+}
+
+/* Delete Button */
+button#deleteProductBtn {
+    background-color: #dc3545; /* Red */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button#deleteProductBtn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}

@@ -62,6 +62,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const products = JSON.parse(localStorage.getItem('products')) || [];
             const inventoryTable = document.getElementById('inventoryTable').querySelector('tbody');
+            const editProductBtn = document.getElementById('editProductBtn');
+            const deleteProductBtn = document.getElementById('deleteProductBtn');
+            let selectedRow = null;
+
+            // Disable buttons by default
+            editProductBtn.disabled = true;
+            deleteProductBtn.disabled = true;
 
             products.forEach((product) => {
                 const row = document.createElement('tr');
@@ -71,17 +78,26 @@
                     <td>${product.productQuantity}</td>
                     <td>${product.productPrice}</td>
                     <td>${product.totalValue}</td>
-                    <td>${product.dateAdded}</td> <!-- Populate Date Added -->
+                    <td>${product.dateAdded}</td>
                 `;
 
                 // Add event listener for row selection
                 row.querySelector('input[type="radio"]').addEventListener('change', () => {
                     selectedRow = row;
-                    editProductBtn.disabled = false;
-                    deleteProductBtn.disabled = false;
+                    editProductBtn.disabled = false; // Enable Edit button
+                    deleteProductBtn.disabled = false; // Enable Delete button
                 });
 
                 inventoryTable.appendChild(row);
+            });
+
+            // Optional: Reset buttons if no row is selected
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('tr')) {
+                    selectedRow = null;
+                    editProductBtn.disabled = true;
+                    deleteProductBtn.disabled = true;
+                }
             });
         });
     </script>
