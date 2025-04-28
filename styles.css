@@ -125,29 +125,39 @@ button.delete-btn:hover {
 }
 
 /* Action Buttons */
-.action-buttons {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-}
-
 .action-buttons button {
+    margin-right: 10px; /* Add spacing between buttons */
     padding: 10px 15px;
+    font-size: 1em;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background: #007bff;
-    color: #fff;
-    font-size: 1em;
 }
 
 .action-buttons button:disabled {
-    background: #ccc;
+    background-color: #ccc; /* Gray background for disabled buttons */
     cursor: not-allowed;
 }
 
 .action-buttons button:hover:not(:disabled) {
     background: #0056b3;
+}
+
+/* Action Container */
+.action-container {
+    display: flex;
+    justify-content: space-between; /* Space between buttons and search input */
+    align-items: center; /* Align items vertically */
+    margin-bottom: 15px;
+}
+
+/* Search Input */
+.search-input {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px; /* Set a fixed width for the search input */
 }
 
 /* Inventory Table */
@@ -229,4 +239,44 @@ button#deleteProductBtn {
 
 button#deleteProductBtn:hover {
     background-color: #c82333; /* Darker red on hover */
+}
+
+/* Add Product Button */
+button#addProductBtn {
+    background-color: #007bff; /* Blue */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+button#addProductBtn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Scrollable Table */
+.scrollable-table {
+    max-height: 400px; /* Set the maximum height for the table */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #dee2e6; /* Optional: Add a border around the table */
+}
+
+.scrollable-table table {
+    width: 100%; /* Ensure the table takes up the full width of the container */
+    border-collapse: collapse;
+}
+
+.scrollable-table th, .scrollable-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.scrollable-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* Keep the header visible while scrolling */
+    z-index: 1;
 }

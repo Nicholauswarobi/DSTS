@@ -21,40 +21,48 @@
     </nav>
 
     <main>
-        <h2>Manage Inventory</h2>
-        <p>Add, edit, or delete products from the inventory.</p>
+        <h1>Manage Inventory</h1>
+        <!-- <p>Add, edit, or delete products from the inventory.</p> -->
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <button id="addProductBtn">Add Product</button>
-            <button id="editProductBtn" disabled>Edit Product</button>
-            <button id="deleteProductBtn" disabled>Delete Product</button>
+        <div class="action-container">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="addProductBtn">Add Product</button>
+                <button id="editProductBtn" disabled>Edit Product</button>
+                <button id="deleteProductBtn" disabled>Delete Product</button>
+            </div>
+
+            <!-- Search Input -->
+            <input type="text" id="searchInput" placeholder="Search products..." class="search-input">
         </div>
 
         <!-- Inventory Table -->
         <div class="table-container">
             <h3>Inventory List</h3>
-            <table id="inventoryTable">
-                <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total Value</th>
-                        <th>Date Added</th> <!-- New column -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dynamic rows will be added here -->
-                </tbody>
-            </table>
+
+            <div class="scrollable-table">
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total Value</th>
+                            <th>Date Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <footer>
+    <!-- <footer>
         <p>&copy; 2025 DSTS. All rights reserved.</p>
-    </footer>
+    </footer> -->
 
     <script src="inventory.js"></script>
     <script>
@@ -62,6 +70,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const products = JSON.parse(localStorage.getItem('products')) || [];
             const inventoryTable = document.getElementById('inventoryTable').querySelector('tbody');
+            const searchInput = document.getElementById('searchInput');
             const editProductBtn = document.getElementById('editProductBtn');
             const deleteProductBtn = document.getElementById('deleteProductBtn');
             let selectedRow = null;
@@ -70,25 +79,45 @@
             editProductBtn.disabled = true;
             deleteProductBtn.disabled = true;
 
-            products.forEach((product) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><input type="radio" name="selectRow"></td>
-                    <td>${product.productName}</td>
-                    <td>${product.productQuantity}</td>
-                    <td>${product.productPrice}</td>
-                    <td>${product.totalValue}</td>
-                    <td>${product.dateAdded}</td>
-                `;
+            // Function to populate the table
+            const populateTable = (filteredProducts) => {
+                inventoryTable.innerHTML = ''; // Clear the table
+                filteredProducts.forEach((product) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="radio" name="selectRow"></td>
+                        <td>${product.productName}</td>
+                        <td>${product.productQuantity}</td>
+                        <td>${product.productPrice}</td>
+                        <td>${product.totalValue}</td>
+                        <td>${product.dateAdded}</td>
+                    `;
 
-                // Add event listener for row selection
-                row.querySelector('input[type="radio"]').addEventListener('change', () => {
-                    selectedRow = row;
-                    editProductBtn.disabled = false; // Enable Edit button
-                    deleteProductBtn.disabled = false; // Enable Delete button
+                    // Add event listener for row selection
+                    row.querySelector('input[type="radio"]').addEventListener('change', () => {
+                        selectedRow = row;
+                        editProductBtn.disabled = false; // Enable Edit button
+                        deleteProductBtn.disabled = false; // Enable Delete button
+                    });
+
+                    inventoryTable.appendChild(row);
                 });
+            };
 
-                inventoryTable.appendChild(row);
+            // Initial population of the table
+            populateTable(products);
+
+            // Filter table rows based on search input
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
+                const filteredProducts = products.filter((product) =>
+                    product.productName.toLowerCase().includes(query) ||
+                    product.productQuantity.toString().includes(query) ||
+                    product.productPrice.toString().includes(query) ||
+                    product.totalValue.toString().includes(query) ||
+                    product.dateAdded.toLowerCase().includes(query)
+                );
+                populateTable(filteredProducts);
             });
 
             // Optional: Reset buttons if no row is selected
