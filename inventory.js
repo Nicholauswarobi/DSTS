@@ -21,9 +21,10 @@ editProductBtn.addEventListener('click', () => {
         const productName = row.cells[1].textContent;
         const productQuantity = row.cells[2].textContent;
         const productPrice = row.cells[3].textContent;
+        const dateAdded = row.cells[5].textContent; // Retrieve the date from the 6th column
 
         // Pass product details as query parameters
-        window.location.href = `edit-product.html?productName=${encodeURIComponent(productName)}&quantity=${encodeURIComponent(productQuantity)}&price=${encodeURIComponent(productPrice)}`;
+        window.location.href = `edit-product.html?productName=${encodeURIComponent(productName)}&quantity=${encodeURIComponent(productQuantity)}&price=${encodeURIComponent(productPrice)}&dateAdded=${encodeURIComponent(dateAdded)}`;
     } else {
         alert('Please select exactly one product to edit.');
     }
