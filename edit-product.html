@@ -20,22 +20,58 @@
     </nav>
 
     <main>
-        <form class="form-container">
+        <form class="form-container" id="editProductForm">
             <label for="productName">Product Name:</label>
             <input type="text" id="productName" required>
             <label for="productQuantity">Quantity:</label>
             <input type="number" id="productQuantity" required>
             <label for="productPrice">Price:</label>
             <input type="number" id="productPrice" step="0.01" required>
+            <label for="dateAdded">Date Added:</label>
+            <input type="date" id="dateAdded" required>
             <button type="submit">Save Changes</button>
         </form>
     </main>
+
     <script>
         // Populate form fields with query parameters
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById('productName').value = urlParams.get('productName');
         document.getElementById('productQuantity').value = urlParams.get('quantity');
         document.getElementById('productPrice').value = urlParams.get('price');
+        document.getElementById('dateAdded').value = urlParams.get('dateAdded'); // Pre-fill the date
+
+        // Handle form submission
+        document.getElementById('editProductForm').addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission
+
+            // Get updated values
+            const updatedProductName = document.getElementById('productName').value;
+            const updatedProductQuantity = document.getElementById('productQuantity').value;
+            const updatedProductPrice = document.getElementById('productPrice').value;
+            const updatedDateAdded = document.getElementById('dateAdded').value;
+            const updatedTotalValue = (updatedProductQuantity * updatedProductPrice).toFixed(2);
+
+            // Update the product in localStorage
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const updatedProducts = products.map((product) => {
+                if (product.productName === urlParams.get('productName')) {
+                    return {
+                        productName: updatedProductName,
+                        productQuantity: updatedProductQuantity,
+                        productPrice: updatedProductPrice,
+                        totalValue: updatedTotalValue,
+                        dateAdded: updatedDateAdded, // Update the date
+                    };
+                }
+                return product;
+            });
+
+            localStorage.setItem('products', JSON.stringify(updatedProducts));
+
+            // Redirect back to inventory.html
+            window.location.href = 'inventory.html';
+        });
     </script>
 </body>
 </html>

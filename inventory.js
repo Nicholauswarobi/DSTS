@@ -11,21 +11,15 @@ addProductBtn.addEventListener('click', () => {
     window.location.href = 'add-product.html'; // Ensure this file exists in the same directory
 });
 
-// Edit Product
+// Redirect to Edit Product Page
 editProductBtn.addEventListener('click', () => {
     if (selectedRow) {
-        const productName = prompt('Edit Product Name:', selectedRow.cells[1].textContent);
-        const productQuantity = prompt('Edit Product Quantity:', selectedRow.cells[2].textContent);
-        const productPrice = prompt('Edit Product Price:', selectedRow.cells[3].textContent);
+        const productName = selectedRow.cells[1].textContent;
+        const productQuantity = selectedRow.cells[2].textContent;
+        const productPrice = selectedRow.cells[3].textContent;
 
-        if (productName && productQuantity && productPrice) {
-            const totalValue = (productQuantity * productPrice).toFixed(2);
-
-            selectedRow.cells[1].textContent = productName;
-            selectedRow.cells[2].textContent = productQuantity;
-            selectedRow.cells[3].textContent = productPrice;
-            selectedRow.cells[4].textContent = totalValue;
-        }
+        // Pass product details as query parameters
+        window.location.href = `edit-product.html?productName=${encodeURIComponent(productName)}&quantity=${encodeURIComponent(productQuantity)}&price=${encodeURIComponent(productPrice)}`;
     } else {
         alert('Please select a product to edit.');
     }
