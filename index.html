@@ -21,12 +21,64 @@
     </nav>
 
     <main>
-        <h2>Welcome to DSTS</h2>
-        <p>Select a section from the navigation menu to get started.</p>
+        <section class="dashboard">
+            <!-- Top Metrics -->
+            <div class="top-metrics">
+                <div class="metric">
+                    <h3>Today's Sales</h3>
+                    <p id="todaySales">$0</p>
+                </div>
+                <div class="metric">
+                    <h3>Today's Profit</h3>
+                    <p id="todayProfit">$0</p>
+                </div>
+                <div class="metric">
+                    <h3>Revenue</h3>
+                    <p id="revenue">$0</p>
+                </div>
+                <div class="metric">
+                    <h3>Expenses</h3>
+                    <p id="expenses">$0</p>
+                </div>
+            </div>
+
+            <!-- Left Metrics -->
+            <div class="left-metrics">
+                <div class="metric">
+                    <h3>Total Stock In</h3>
+                    <p id="totalStockIn">0</p>
+                </div>
+                <div class="metric">
+                    <h3>Total Stock Out</h3>
+                    <p id="totalStockOut">0</p>
+                </div>
+                <div class="metric">
+                    <h3>Remaining Stock</h3>
+                    <p id="remainingStock">0</p>
+                </div>
+            </div>
+
+            <!-- Right Metrics -->
+            <div class="top-products">
+                <h3>Top 5 Sales Products</h3>
+                <ul id="topProducts">
+                    <!-- Top products will be dynamically added here -->
+                </ul>
+            </div>
+
+            <!-- Center Graph -->
+            <div class="graphs">
+                <h3>Revenue and Purchase Cost</h3>
+                <canvas id="revenueGraph"></canvas>
+            </div>
+        </section>
     </main>
 
     <footer>
         <p>&copy; 2025 DSTS. All rights reserved.</p>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="chart.js"></script>
 </body>
 </html>

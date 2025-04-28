@@ -23,11 +23,54 @@
     <main>
         <h2>Sales Recording Section</h2>
         <p>Here you can record daily sales transactions.</p>
-        <!-- Add form or table for sales recording -->
+
+        <!-- Big Button to Open Sales Form -->
+        <div class="center-button">
+            <button id="addSaleBtn">Record New Sale</button>
+        </div>
+
+        <!-- Sales Form (Initially Hidden) -->
+        <div id="salesFormContainer" class="sales-form hidden">
+            <form id="salesForm">
+                <label for="productSelect">Product:</label>
+                <select id="productSelect" required>
+                    <option value="">Select a product</option>
+                    <!-- Options will be dynamically added -->
+                </select>
+
+                <label for="quantityInput">Quantity:</label>
+                <input type="number" id="quantityInput" min="1" required>
+
+                <label for="priceDisplay">Price:</label>
+                <input type="text" id="priceDisplay" readonly>
+
+                <button type="submit">Add Sale</button>
+            </form>
+        </div>
+
+        <!-- Past Sales Table -->
+        <div class="sales-table">
+            <h3>Past Sales</h3>
+            <table id="pastSalesTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Past sales will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
     </main>
 
     <footer>
         <p>&copy; 2025 DSTS. All rights reserved.</p>
     </footer>
+    <script src="sales.js"></script>
 </body>
 </html>
