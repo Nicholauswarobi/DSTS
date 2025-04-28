@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${sale.quantity}</td>
                 <td>$${sale.price.toFixed(2)}</td>
                 <td>$${(sale.quantity * sale.price).toFixed(2)}</td>
-                <td>${sale.date}</td>
+                <td>${sale.date} ${sale.time}</td>
             `;
             pastSalesTable.appendChild(row);
         });
@@ -78,11 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
             product.quantity -= quantity;
 
             // Add sale to past sales
+            const now = new Date();
             const sale = {
                 productName,
                 quantity,
                 price,
-                date: new Date().toLocaleDateString(),
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(), // Add the current time
             };
             pastSales.push(sale);
             localStorage.setItem('sales', JSON.stringify(pastSales));
