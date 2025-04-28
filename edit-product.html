@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Edit Product</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="financial.html">Financial Tracking</a></li>
+            <li><a href="inventory.html">Inventory Updates</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <form class="form-container">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+            <label for="productQuantity">Quantity:</label>
+            <input type="number" id="productQuantity" required>
+            <label for="productPrice">Price:</label>
+            <input type="number" id="productPrice" step="0.01" required>
+            <button type="submit">Save Changes</button>
+        </form>
+    </main>
+    <script>
+        // Populate form fields with query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('productName').value = urlParams.get('productName');
+        document.getElementById('productQuantity').value = urlParams.get('quantity');
+        document.getElementById('productPrice').value = urlParams.get('price');
+    </script>
+</body>
+</html>

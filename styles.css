@@ -61,3 +61,138 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+/* Form container */
+.form-container {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-container label {
+    font-weight: bold;
+}
+
+.form-container input, .form-container button {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.form-container button {
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background: #0056b3;
+}
+
+/* Table actions */
+button.edit-btn {
+    background: #ffc107;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.delete-btn {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.edit-btn:hover {
+    background: #e0a800;
+}
+
+button.delete-btn:hover {
+    background: #c82333;
+}
+
+/* Action Buttons */
+.action-buttons {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #007bff;
+    color: #fff;
+    font-size: 1em;
+}
+
+.action-buttons button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.action-buttons button:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+/* Inventory Table */
+.table-container {
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table thead {
+    background: #f8f9fa;
+    text-align: left;
+}
+
+table th, table td {
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background: #f1f3f5;
+}
+
+table th {
+    font-weight: bold;
+    color: #495057;
+}
+
+table td {
+    color: #212529;
+}
+
+table td input[type="radio"] {
+    cursor: pointer;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Add Product</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="financial.html">Financial Tracking</a></li>
+            <li><a href="inventory.html">Inventory Updates</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <form class="form-container" id="addProductForm">
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+            <label for="productQuantity">Quantity:</label>
+            <input type="number" id="productQuantity" required>
+            <label for="productPrice">Price:</label>
+            <input type="number" id="productPrice" step="0.01" required>
+            <button type="submit">Add Product</button>
+        </form>
+    </main>
+
+    <script>
+        // Handle form submission
+        document.getElementById('addProductForm').addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent the default form submission behavior
+
+            // Get form values
+            const productName = document.getElementById('productName').value;
+            const productQuantity = document.getElementById('productQuantity').value;
+            const productPrice = document.getElementById('productPrice').value;
+
+            // Calculate total value
+            const totalValue = (productQuantity * productPrice).toFixed(2);
+
+            // Save product data to localStorage
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            products.push({ productName, productQuantity, productPrice, totalValue });
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Redirect back to inventory.html
+            window.location.href = 'inventory.html';
+        });
+    </script>
+</body>
+</html>
