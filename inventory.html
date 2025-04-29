@@ -48,7 +48,7 @@
                             <th>Product Name</th>
                             <th>Quantity</th>
                             <th>Price</th>
-                            <th>Total Value</th>
+                            <th>Purchase</th> <!-- New Purchase Column -->
                             <th>Date Added</th>
                         </tr>
                     </thead>
@@ -89,7 +89,7 @@
                         <td>${product.productName}</td>
                         <td>${product.productQuantity}</td>
                         <td>${product.productPrice}</td>
-                        <td>${product.totalValue}</td>
+                        <td>${product.purchase || ''}</td> <!-- New Purchase Column Data -->
                         <td>${product.dateAdded}</td>
                     `;
 

@@ -460,3 +460,85 @@ button#addProductBtn:hover {
     top: 0;
     z-index: 1;
 }
+
+/* Edit and Delete Buttons */
+.edit-sale-btn,
+.delete-sale-btn {
+    padding: 10px 15px; /* Consistent padding */
+    font-size: 1rem; /* Consistent font size */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100px; /* Set a fixed width for uniform size */
+    text-align: center; /* Center the text */
+}
+
+.edit-sale-btn {
+    background-color: #007bff; /* Blue for Edit */
+}
+
+.edit-sale-btn:hover {
+    background-color: #0056b3; /* Darker Blue on Hover */
+}
+
+.delete-sale-btn {
+    background-color: #dc3545; /* Red for Delete */
+    margin-left: 5px;
+}
+
+.delete-sale-btn:hover {
+    background-color: #a71d2a; /* Darker Red on Hover */
+}
+
+/* Optional: Add icons styling */
+.edit-sale-btn i,
+.delete-sale-btn i {
+    margin-right: 5px;
+}
+
+/* Modal Styles */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease-in-out;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.hidden {
+    display: none;
+}

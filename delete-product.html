@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Product</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Delete Product</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="financial.html">Financial Tracking</a></li>
+            <li><a href="inventory.html">Inventory Updates</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <p>Are you sure you want to delete the product <strong id="productName"></strong>?</p>
+        <button id="confirmDeleteBtn">Yes, Delete</button>
+        <button onclick="window.history.back()">Cancel</button>
+    </main>
+    <script>
+        // Display product name from query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        document.getElementById('productName').textContent = urlParams.get('productName');
+
+        // Handle delete confirmation
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            alert(`Product "${urlParams.get('productName')}" deleted successfully!`);
+            window.location.href = 'inventory.html'; // Redirect back to the inventory page
+        });
+    </script>
+</body>
+</html>

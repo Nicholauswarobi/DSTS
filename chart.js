@@ -1,66 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Example data (replace with actual data from localStorage or API)
-    const salesData = [
-        { productName: 'Hammer', quantity: 10, price: 15, cost: 10 },
-        { productName: 'Nails', quantity: 50, price: 0.5, cost: 0.3 },
-        { productName: 'Screwdriver', quantity: 20, price: 8, cost: 5 },
-        { productName: 'Drill', quantity: 5, price: 50, cost: 30 },
-        { productName: 'Saw', quantity: 8, price: 25, cost: 15 },
-    ];
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const sales = JSON.parse(localStorage.getItem('sales')) || [];
 
-    // Calculate metrics
-    const totalStockIn = salesData.reduce((sum, item) => sum + item.quantity, 0);
-    const totalStockOut = salesData.reduce((sum, item) => sum + item.quantity, 0); // Example: same as stock in
-    const remainingStock = totalStockIn - totalStockOut; // Example calculation
-    const revenue = salesData.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    const expenses = salesData.reduce((sum, item) => sum + item.quantity * item.cost, 0);
-    const profit = revenue - expenses;
+    // Get today's date in the same format as stored in sales
+    const today = new Date().toLocaleDateString();
+
+    // Calculate Total Stock In (sum of all product quantities in the store)
+    const totalStockIn = products.reduce((sum, product) => sum + parseInt(product.productQuantity, 10), 0);
+
+    // Calculate Total Stock Out (sum of all quantities sold)
+    const totalStockOut = sales.reduce((sum, sale) => sum + sale.quantity, 0);
+
+    // Calculate Remaining Stock (Total Stock In - Total Stock Out)
+    const remainingStock = totalStockIn - totalStockOut;
+
+    // Calculate Revenue (sum of all sales revenue)
+    const revenue = sales.reduce((sum, sale) => sum + sale.quantity * sale.price, 0);
+
+    // Filter sales for today
+    const todaySales = sales.filter((sale) => sale.date === today);
+    const todaySalesTotal = todaySales.reduce((sum, sale) => sum + sale.quantity * sale.price, 0);
+
+    // Calculate Today's Profit
+    const todayProfit = todaySales.reduce((sum, sale) => {
+        const product = products.find((p) => p.productName === sale.productName);
+        const costPrice = product ? parseFloat(product.productPrice) : 0; // Assuming cost price is stored in productPrice
+        return sum + (sale.price - costPrice) * sale.quantity;
+    }, 0);
 
     // Update metrics in the DOM
     document.getElementById('totalStockIn').textContent = totalStockIn;
     document.getElementById('totalStockOut').textContent = totalStockOut;
     document.getElementById('remainingStock').textContent = remainingStock;
     document.getElementById('revenue').textContent = `$${revenue.toFixed(2)}`;
-    document.getElementById('expenses').textContent = `$${expenses.toFixed(2)}`;
-    document.getElementById('profit').textContent = `$${profit.toFixed(2)}`;
-
-    // Display top 5 sales products
-    const topProducts = salesData
-        .sort((a, b) => b.quantity * b.price - a.quantity * a.price)
-        .slice(0, 5);
-    const topProductsList = document.getElementById('topProducts');
-    topProducts.forEach((product) => {
-        const li = document.createElement('li');
-        li.textContent = `${product.productName} - $${(product.quantity * product.price).toFixed(2)}`;
-        topProductsList.appendChild(li);
-    });
-
-    // Create revenue and purchase cost graph
-    const ctx = document.getElementById('revenueGraph').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: salesData.map((item) => item.productName),
-            datasets: [
-                {
-                    label: 'Revenue',
-                    data: salesData.map((item) => item.quantity * item.price),
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                },
-                {
-                    label: 'Purchase Cost',
-                    data: salesData.map((item) => item.quantity * item.cost),
-                    backgroundColor: 'rgba(220, 53, 69, 0.5)',
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-            },
-        },
-    });
+    document.getElementById('todaySales').textContent = `$${todaySalesTotal.toFixed(2)}`;
+    document.getElementById('todayProfit').textContent = `$${todayProfit.toFixed(2)}`;
 });

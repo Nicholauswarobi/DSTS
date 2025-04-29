@@ -7,12 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceDisplay = document.getElementById('priceDisplay');
     const pastSalesTable = document.getElementById('pastSalesTable').querySelector('tbody');
 
-    // Example stock data (replace with actual data from localStorage)
-    const stockData = [
-        { productName: 'Hammer', quantity: 10, price: 15 },
-        { productName: 'Nails', quantity: 50, price: 0.5 },
-        { productName: 'Screwdriver', quantity: 20, price: 8 },
-    ];
+    // Retrieve products from localStorage
+    const stockData = JSON.parse(localStorage.getItem('products')) || [];
 
     // Example past sales data (replace with actual data from localStorage)
     const pastSales = JSON.parse(localStorage.getItem('sales')) || [];
@@ -21,11 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const populateProductDropdown = () => {
         productSelect.innerHTML = '<option value="">Select a product</option>';
         stockData.forEach((product) => {
-            if (product.quantity > 0) {
+            if (product.productQuantity > 0) {
                 const option = document.createElement('option');
                 option.value = product.productName;
-                option.textContent = `${product.productName} (Available: ${product.quantity})`;
-                option.dataset.price = product.price;
+                option.textContent = `${product.productName} (Remaining: ${product.productQuantity})`;
+                option.dataset.price = product.productPrice;
+                option.dataset.remainingStock = product.productQuantity; // Store remaining stock in the option
                 productSelect.appendChild(option);
             }
         });
@@ -34,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Populate past sales table
     const populatePastSalesTable = () => {
         pastSalesTable.innerHTML = '';
-        pastSales.forEach((sale) => {
+        pastSales.forEach((sale, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${sale.productName}</td>
@@ -42,9 +39,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>$${sale.price.toFixed(2)}</td>
                 <td>$${(sale.quantity * sale.price).toFixed(2)}</td>
                 <td>${sale.date} ${sale.time}</td>
+                <td>
+                    <button class="edit-sale-btn" data-index="${index}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-sale-btn" data-index="${index}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
             `;
             pastSalesTable.appendChild(row);
         });
+
+        // Attach event listeners to Edit and Delete buttons
+        document.querySelectorAll('.edit-sale-btn').forEach((button) => {
+            button.addEventListener('click', handleEditSale);
+        });
+
+        document.querySelectorAll('.delete-sale-btn').forEach((button) => {
+            button.addEventListener('click', handleDeleteSale);
+        });
+    };
+
+    // Handle Edit Sale
+    const handleEditSale = (e) => {
+        const saleIndex = e.target.closest('button').dataset.index;
+        const sale = pastSales[saleIndex];
+
+        // Populate the sales form with the selected sale's data
+        productSelect.value = sale.productName;
+        quantityInput.value = sale.quantity;
+        priceDisplay.value = sale.price;
+
+        // Store the index of the sale being edited
+        salesForm.dataset.editIndex = saleIndex;
+
+        // Show the sales form for editing
+        salesFormContainer.classList.remove('hidden');
+    };
+
+    // Handle Delete Sale
+    const handleDeleteSale = (e) => {
+        const saleIndex = e.target.dataset.index;
+
+        // Confirm deletion
+        const confirmDelete = confirm('Are you sure you want to delete this sale?');
+        if (confirmDelete) {
+            // Remove the sale from the array and update localStorage
+            pastSales.splice(saleIndex, 1);
+            localStorage.setItem('sales', JSON.stringify(pastSales));
+
+            // Refresh the table
+            populatePastSalesTable();
+        }
     };
 
     // Show sales form on button click
@@ -72,31 +119,45 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Update stock
-        const product = stockData.find((item) => item.productName === productName);
-        if (product && product.quantity >= quantity) {
-            product.quantity -= quantity;
-
-            // Add sale to past sales
+        // Check if editing an existing sale
+        const editIndex = salesForm.dataset.editIndex;
+        if (editIndex !== undefined) {
+            // Update the existing sale
+            pastSales[editIndex] = {
+                productName,
+                quantity,
+                price,
+                date: pastSales[editIndex].date, // Keep the original date
+                time: pastSales[editIndex].time, // Keep the original time
+            };
+            delete salesForm.dataset.editIndex; // Clear the edit index
+        } else {
+            // Add a new sale
             const now = new Date();
-            const sale = {
+            pastSales.push({
                 productName,
                 quantity,
                 price,
                 date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString(), // Add the current time
-            };
-            pastSales.push(sale);
-            localStorage.setItem('sales', JSON.stringify(pastSales));
+                time: now.toLocaleTimeString(),
+            });
 
-            // Refresh UI
-            populateProductDropdown();
-            populatePastSalesTable();
-            salesForm.reset();
-            salesFormContainer.classList.add('hidden');
-        } else {
-            alert('Insufficient stock for the selected product.');
+            // Update the inventory quantity
+            const product = stockData.find((item) => item.productName === productName);
+            if (product) {
+                product.productQuantity -= quantity; // Reduce the quantity in inventory
+                localStorage.setItem('products', JSON.stringify(stockData)); // Update inventory in localStorage
+            }
         }
+
+        // Update localStorage
+        localStorage.setItem('sales', JSON.stringify(pastSales));
+
+        // Refresh the table and reset the form
+        populatePastSalesTable();
+        populateProductDropdown(); // Refresh the dropdown to show updated stock
+        salesForm.reset();
+        salesFormContainer.classList.add('hidden');
     });
 
     // Initial population of past sales table

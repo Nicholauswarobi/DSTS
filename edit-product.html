@@ -22,13 +22,17 @@
     <main>
         <form class="form-container" id="editProductForm">
             <label for="productName">Product Name:</label>
-            <input type="text" id="productName" required>
+            <input type="text" id="productName" readonly>
+
             <label for="productQuantity">Quantity:</label>
             <input type="number" id="productQuantity" required>
+
             <label for="productPrice">Price:</label>
             <input type="number" id="productPrice" step="0.01" required>
-            <label for="dateAdded">Date Added:</label>
-            <input type="date" id="dateAdded" required>
+
+            <label for="productPurchase">Purchase:</label> <!-- New Purchase Field -->
+            <input type="number" id="productPurchase" step="0.01" required>
+
             <button type="submit">Save Changes</button>
         </form>
     </main>
@@ -39,38 +43,40 @@
         document.getElementById('productName').value = urlParams.get('productName');
         document.getElementById('productQuantity').value = urlParams.get('quantity');
         document.getElementById('productPrice').value = urlParams.get('price');
-        document.getElementById('dateAdded').value = urlParams.get('dateAdded'); // Pre-fill the date
+        document.getElementById('productPurchase').value = urlParams.get('purchase'); // Pre-fill the Purchase field
 
-        // Handle form submission
+        // Handle Edit Product form submission
         document.getElementById('editProductForm').addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault();
 
-            // Get updated values
-            const updatedProductName = document.getElementById('productName').value;
-            const updatedProductQuantity = document.getElementById('productQuantity').value;
-            const updatedProductPrice = document.getElementById('productPrice').value;
-            const updatedDateAdded = document.getElementById('dateAdded').value;
-            const updatedTotalValue = (updatedProductQuantity * updatedProductPrice).toFixed(2);
+            const productName = document.getElementById('productName').value;
+            const productQuantity = parseInt(document.getElementById('productQuantity').value, 10);
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const productPurchase = parseFloat(document.getElementById('productPurchase').value); // New Purchase Field
 
-            // Update the product in localStorage
+            if (!productName || productQuantity <= 0 || isNaN(productPrice) || isNaN(productPurchase)) {
+                alert('Please fill out all fields correctly.');
+                return;
+            }
+
+            // Update product in localStorage
             const products = JSON.parse(localStorage.getItem('products')) || [];
-            const updatedProducts = products.map((product) => {
-                if (product.productName === urlParams.get('productName')) {
-                    return {
-                        productName: updatedProductName,
-                        productQuantity: updatedProductQuantity,
-                        productPrice: updatedProductPrice,
-                        totalValue: updatedTotalValue,
-                        dateAdded: updatedDateAdded, // Update the date
-                    };
-                }
-                return product;
-            });
+            const productIndex = products.findIndex((product) => product.productName === productName);
 
-            localStorage.setItem('products', JSON.stringify(updatedProducts));
-
-            // Redirect back to inventory.html
-            window.location.href = 'inventory.html';
+            if (productIndex !== -1) {
+                products[productIndex] = {
+                    productName,
+                    productQuantity,
+                    productPrice,
+                    productPurchase, // Save Purchase Field
+                    dateAdded: products[productIndex].dateAdded, // Keep original date
+                };
+                localStorage.setItem('products', JSON.stringify(products));
+                alert('Product updated successfully!');
+                window.location.href = 'inventory.html';
+            } else {
+                alert('Product not found!');
+            }
         });
     </script>
 </body>
