@@ -1,14 +1,14 @@
 /* Calendar Container */
 .calendar-container {
   width: 100%;
-  height: 300px; /* or a fixed value like 500px if needed */
+  height: 230px; /* or a fixed value like 500px if needed */
   position: relative;
   overflow: hidden;
 }
 
 .calendar {
   width: 100%;
-  height: 100%;
+  height: 200px;
   box-sizing: border-box;
 }
 
@@ -68,7 +68,7 @@
     background-color: #007BFF;
     color: white;
     padding: 2px; /* Reduce padding for table headers */
-    font-size: 0.6rem; /* Reduce font size for table headers */
+    font-size: 0.8rem; /* Reduce font size for table headers */
     font-weight: bold;
     text-align: center;
 }
@@ -81,7 +81,7 @@
     border: 1px solid #ddd;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 0.6rem; /* Reduce font size for table cells */
+    font-size: 1rem; /* Reduce font size for table cells */
     padding: 0;
 }
 
