@@ -66,7 +66,7 @@ nav ul li a:hover {
 main {
     flex: 1; /* Allow the main content to grow and take up available space */
     overflow-y: auto; /* Enable scrolling for the main content */
-    padding: 200px 20px 20px;
+    padding: 150px 20px 20px;
 }
 
 section {
