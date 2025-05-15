@@ -1,0 +1,95 @@
+/* Calendar Container */
+.calendar-container {
+  width: 100%;
+  height: 300px; /* or a fixed value like 500px if needed */
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+
+/* Calendar Title */
+.calendar-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+/* Calendar Header */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 0 5px;
+}
+
+.calendar-header h4 {
+    margin: 0;
+    font-size: 0.8rem; /* Reduce font size for the title */
+    color: #333;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-header .btn {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    font-size: 0.7rem; /* Reduce font size for buttons */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calendar-header .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Calendar Table */
+.calendar {
+    width: 100%;
+    border-collapse: collapse;
+    flex-grow: 1; /* Allow the table to take up remaining space */
+}
+
+.calendar th {
+    background-color: #007BFF;
+    color: white;
+    padding: 2px; /* Reduce padding for table headers */
+    font-size: 0.6rem; /* Reduce font size for table headers */
+    font-weight: bold;
+    text-align: center;
+}
+
+.calendar td {
+    width: 14.28%; /* 100% divided by 7 days */
+    height: calc((200px - 60px) / 6); /* Dynamically calculate height for 6 rows */
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.6rem; /* Reduce font size for table cells */
+    padding: 0;
+}
+
+.calendar td:hover {
+    background-color: #f0f8ff;
+}
+
+.calendar-day {
+    font-size: 0.7rem;
+    color: #333;
+}

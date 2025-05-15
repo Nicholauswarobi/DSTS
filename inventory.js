@@ -20,8 +20,8 @@ editProductBtn.addEventListener('click', () => {
         const row = selectedRows[0].closest('tr');
         const productName = row.cells[1].textContent;
         const productQuantity = row.cells[2].textContent;
-        const productPrice = row.cells[3].textContent;
-        const productPurchase = row.cells[4].textContent; // Get Purchase value
+        const productPrice = row.cells[3].textContent.replace('TSH ', ''); // Remove $ sign
+        const productPurchase = row.cells[4].textContent.replace('TSH ', ''); // Remove $ sign
         const dateAdded = row.cells[5].textContent;
 
         // Pass product details as query parameters
@@ -81,12 +81,26 @@ const populateInventoryTable = () => {
             <td><input type="checkbox" class="selectRow"></td>
             <td>${product.productName}</td>
             <td>${product.productQuantity}</td>
-            <td>$${product.productPrice.toFixed(2)}</td>
-            <td>$${product.productPurchase.toFixed(2)}</td> <!-- New Purchase Column -->
+            <td>TZS ${parseFloat(product.productPrice).toFixed(2)}</td>
+            <td>TZS ${parseFloat(product.productPurchase).toFixed(2)}</td> <!-- Ensure Purchase value is displayed -->
             <td>${product.dateAdded}</td>
         `;
         inventoryTable.appendChild(row);
     });
+};
+
+// Example: Add Product Function (Ensure Purchase is included when adding)
+const addProduct = (productName, productQuantity, productPrice, productPurchase, dateAdded) => {
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    products.push({
+        productName,
+        productQuantity,
+        productPrice: parseFloat(productPrice), // Ensure it's stored as a number
+        productPurchase: parseFloat(productPurchase), // Ensure it's stored as a number
+        dateAdded
+    });
+    localStorage.setItem('products', JSON.stringify(products));
+    populateInventoryTable();
 };
 
 // Initial population of the inventory table

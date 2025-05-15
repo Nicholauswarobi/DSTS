@@ -1,0 +1,289 @@
+/* General Styles */
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: sticky; /* Make the header sticky */
+    top: 0; /* Stick to the top of the viewport */
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+    
+    
+}
+nav {
+    background: #333;
+    color: #fff;
+    padding: 0.5rem 0;
+    text-align: center;
+    position: fixed; /* Fixed position */
+    top: 100px; /* Adjust this value based on the header height */
+    left: 0;
+    width: 100%;
+    height: 40px;
+    z-index: 1000; /* Just below the header */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1rem;
+}
+
+nav ul li {
+    
+    display: inline;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+nav ul li a:hover {
+    background: #007BFF;
+}
+
+/* Main Content */
+main {
+    height: calc(87vh - 80px); /* Adjust height to fit header and footer */
+    padding: 20px;
+    /* max-width: 100vw; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+
+/* Expense Form Section */
+.expense-form {
+    background-color: #ffffff;
+    padding: 20px 40px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.expense-form h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #007bff;
+    text-align: center;
+}
+
+.expense-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.expense-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.expense-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.expense-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Expense Table Section */
+.expense-table {
+    background-color: #ffffff;
+    border-radius: 8px;
+    width: 700px;
+    height: 500px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+;
+}
+
+.expense-table h2 {
+    margin-top: 0;
+    margin: 0;
+    background-color: #ffffff; /* Match the background color */
+    color:  #007bff;
+    text-align: center;
+    padding: 10px;
+    z-index: 1000; /* Ensure it stays above other elements */
+    border-bottom: 1px solid #ddd; /* Optional: Add a bottom border for separation */
+}
+.table-container{
+    width: 100%;
+    height: 100%;
+    /* margin: 0 0 20px 0 ;
+    padding: 0 0 20px 0 ; */
+    overflow-y: auto;
+    
+}
+
+.expense-table table {
+    width: 100%;
+    border-collapse: collapse;
+    /* margin-top: 15px; */
+}
+
+.expense-table th, .expense-table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.expense-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    position: sticky; /* Make the table header sticky */
+    top: 0; /* Stick to the top of the table container */
+    z-index: 999; /* Ensure it stays above table rows */
+}
+
+.expense-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 0px;
+    height: 80px;
+}
+
+/* General Button Styles */
+button, .btn {
+    background-color: #007bff; /* Primary blue color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+button:hover, .btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+button:active, .btn:active {
+    background-color: #003f7f; /* Even darker blue on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
+button:disabled, .btn:disabled {
+    background-color: #cccccc; /* Gray for disabled state */
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Specific Button Variants */
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-danger {
+    background-color: #f44336; /* Red for danger actions */
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+.btn-success {
+    background-color: #4CAF50; /* Green for success actions */
+}
+
+.btn-success:hover {
+    background-color: #388E3C;
+}
+
+/* General Media Query for Screens Less Than 850px */
+@media (max-width: 850px) {
+    body{
+        height: 100vh;
+        overflow:auto;
+
+    }
+    main {
+        flex-direction: column; /* Switch to column layout */
+        align-items: stretch; /* Ensure items take full width */
+    }
+
+    .expense-form, .expense-table {
+        width: 100%; /* Make the sections take full width */
+        margin: 10px 0; /* Add some spacing between sections */
+    }
+
+    .expense-table {
+        height: auto; /* Allow the table to adjust its height */
+    }
+
+    .expense-table h2 {
+        font-size: 1.2rem; /* Adjust font size for smaller screens */
+    }
+
+    .expense-form h2 {
+        font-size: 1.2rem; /* Adjust font size for smaller screens */
+    }
+
+    .expense-form input, .expense-form button {
+        font-size: 0.9rem; /* Adjust input and button font sizes */
+    }
+
+    footer {
+        position: absolute; /* Ensure footer stays below content */
+        bottom: 0; /* Adjust height for smaller screens */
+        padding: 15px;
+
+    }
+}

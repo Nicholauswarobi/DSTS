@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financial Tracking</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="financial.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <header>
@@ -14,20 +17,171 @@
 
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="dsts.html">Dashboard</a></li>
             <li><a href="sales.html">Sales Recording</a></li>
             <li><a href="inventory.html">Inventory Updates</a></li>
+            <li><a href="expenses.html">Expenses</a></li>
         </ul>
     </nav>
 
     <main>
         <h2>Financial Tracking Section</h2>
         <p>Here you can monitor finances and generate reports.</p>
-        <!-- Add financial tracking tools -->
+
+        <!-- Notification Section -->
+        <div id="notification" class="notification" style="display: none;"></div>
+
+        <!-- Date Filter -->
+        <section class="filter-section">
+            <label for="filter-date">Filter by Date:</label>
+            <input type="date" id="filter-date">
+            <button id="filter-button" class="btn">Filter</button>
+            <button id="export-button" class="btn">Export Filtered Data</button>
+        </section>
+
+        <!-- Inventory History Table -->
+        <section class="table-section">
+            <h3>Inventory History</h3>
+            <div class="table-container">
+                <table id="inventory-table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sales History Table -->
+        <section class="table-section">
+            <h3>Sales History</h3>
+            <div class="table-container">
+                <table id="sales-table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Expenses History Table -->
+        <section class="table-section">
+            <h3>Expenses History</h3>
+            <div class="table-container">
+                <table id="expenses-table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <footer>
         <p>&copy; 2025 DSTS. All rights reserved.</p>
     </footer>
+
+    <script>
+        const inventoryData = JSON.parse(localStorage.getItem('products')) || [];
+        const salesData = JSON.parse(localStorage.getItem('sales')) || [];
+        const expensesData = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        const showNotification = (message, type) => {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`; // Add type-specific class (e.g., success, error)
+            notification.style.display = 'block';
+
+            // Hide the notification after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        };
+
+        const populateTable = (tableId, data, columns) => {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            tableBody.innerHTML = '';
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = row[col] || '';
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        };
+
+        const refreshTables = () => {
+            populateTable('inventory-table', inventoryData, ['dateAdded', 'productName', 'productQuantity', 'status']);
+            populateTable('sales-table', salesData, ['date', 'productName', 'quantity', 'total']);
+            populateTable('expenses-table', expensesData, ['expenseDate', 'expenseName', 'expenseAmount', 'description']);
+        };
+
+        document.getElementById('filter-button').addEventListener('click', () => {
+            const filterDate = document.getElementById('filter-date').value;
+            if (!filterDate) return;
+
+            const filteredInventory = inventoryData.filter(item => item.dateAdded === filterDate);
+            const filteredSales = salesData.filter(sale => sale.date === filterDate);
+            const filteredExpenses = expensesData.filter(expense => expense.expenseDate === filterDate);
+
+            populateTable('inventory-table', filteredInventory, ['dateAdded', 'productName', 'productQuantity', 'status']);
+            populateTable('sales-table', filteredSales, ['date', 'productName', 'quantity', 'total']);
+            populateTable('expenses-table', filteredExpenses, ['expenseDate', 'expenseName', 'expenseAmount', 'description']);
+        });
+
+        document.getElementById('export-button').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const addTableToPDF = (title, tableId, startY) => {
+                doc.text(title, 10, startY);
+                const table = document.getElementById(tableId);
+                const rows = Array.from(table.rows).map(row => Array.from(row.cells).map(cell => cell.textContent));
+                doc.autoTable({
+                    startY: startY + 10,
+                    head: [rows[0]],
+                    body: rows.slice(1),
+                });
+                return doc.lastAutoTable.finalY + 10;
+            };
+
+            let currentY = 10;
+            currentY = addTableToPDF('Inventory History', 'inventory-table', currentY);
+            currentY = addTableToPDF('Sales History', 'sales-table', currentY);
+            addTableToPDF('Expenses History', 'expenses-table', currentY);
+
+            doc.save('Filtered_Data.pdf');
+            showNotification('PDF exported successfully!', 'success');
+        });
+
+        // Initial population of tables
+        refreshTables();
+    </script>
 </body>
 </html>

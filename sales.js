@@ -1,3 +1,5 @@
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const addSaleBtn = document.getElementById('addSaleBtn');
     const salesFormContainer = document.getElementById('salesFormContainer');
@@ -36,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
             row.innerHTML = `
                 <td>${sale.productName}</td>
                 <td>${sale.quantity}</td>
-                <td>$${sale.price.toFixed(2)}</td>
-                <td>$${(sale.quantity * sale.price).toFixed(2)}</td>
+                <td>TSH ${sale.price.toFixed(2)}</td>
+                <td>TSH ${(sale.quantity * sale.price).toFixed(2)}</td>
                 <td>${sale.date} ${sale.time}</td>
                 <td>
                     <button class="edit-sale-btn" data-index="${index}">

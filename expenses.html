@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expenses</title>
+<link rel="stylesheet" href="expenses.css">
+</head>
+<body>
+<header>
+    <h1>Daily Expenses</h1>
+</header>
+
+ <nav>
+        <ul>
+
+            <li><a href="dsts.html">Dashboard</a></li>
+            <li><a href="sales.html">Sales Recording</a></li>
+            <li><a href="inventory.html">Inventory Updates</a></li>
+            <li><a href="financial.html">Financial Tracking</a></li>
+        </ul>
+    </nav>
+
+
+<main>
+    <section class="expense-form">
+        <h2>Add Expense</h2>
+        <form id="expenseForm">
+            <label for="expenseName">Expense Name:</label>
+            <input type="text" id="expenseName" required>
+            
+            <label for="expenseAmount">Amount (TSH):</label>
+            <input type="number" id="expenseAmount" required>
+            
+            <label for="expenseDate">Date:</label>
+            <input type="date" id="expenseDate" required>
+            
+            <button type="submit">Add Expense</button>
+        </form>
+    </section>
+
+    <section class="expense-table">
+        <h2>Expense Records</h2>
+        <div class="table-container">
+            <table>
+            <thead>
+                <tr>
+                    <th>Expense Name</th>
+                    <th>Amount (TSH)</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+                <!-- Expenses will be dynamically added here -->
+            </tbody>
+        </table>
+        </div>
+    </section>
+    <footer>
+    <p>&copy; 2025 DSTS. All rights reserved.</p>
+</footer>
+</main>
+
+
+
+<script>
+    // Handle adding expenses
+    const expenseForm = document.getElementById('expenseForm');
+    const expenseTableBody = document.getElementById('expenseTableBody');
+
+    expenseForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Get form values
+        const expenseName = document.getElementById('expenseName').value;
+        const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+        const expenseDate = document.getElementById('expenseDate').value;
+
+        // Save expense to localStorage
+        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        expenses.push({ expenseName, expenseAmount, expenseDate });
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        // Update the table
+        populateExpenseTable();
+
+        // Reset the form
+        expenseForm.reset();
+    });
+
+    // Populate the expense table
+    const populateExpenseTable = () => {
+        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        expenseTableBody.innerHTML = '';
+
+        expenses.forEach((expense, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${expense.expenseName}</td>
+                <td>${expense.expenseAmount.toFixed(2)}</td>
+                <td>${expense.expenseDate}</td>
+                <td><button class="delete-button" data-index="${index}">Delete</button></td>
+            `;
+            expenseTableBody.appendChild(row);
+        });
+
+        // Add event listeners to delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const index = e.target.getAttribute('data-index');
+                deleteExpense(index);
+            });
+        });
+    };
+
+    // Delete an expense
+    const deleteExpense = (index) => {
+        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        expenses.splice(index, 1); // Remove the expense at the given index
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        populateExpenseTable(); // Refresh the table
+    };
+
+    // Initial population of the table
+    populateExpenseTable();
+</script>
+</body>
+</html>

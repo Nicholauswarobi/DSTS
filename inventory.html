@@ -14,8 +14,9 @@
 
     <nav>
         <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="dsts.html">Dashboard</a></li>
             <li><a href="sales.html">Sales Recording</a></li>
+            <li><a href="expenses.html">Expenses</a></li>
             <li><a href="financial.html">Financial Tracking</a></li>
         </ul>
     </nav>
@@ -48,7 +49,7 @@
                             <th>Product Name</th>
                             <th>Quantity</th>
                             <th>Price</th>
-                            <th>Purchase</th> <!-- New Purchase Column -->
+                            <th>Purchase</th> <!-- Ensure this matches the data being populated -->
                             <th>Date Added</th>
                         </tr>
                     </thead>
@@ -89,7 +90,7 @@
                         <td>${product.productName}</td>
                         <td>${product.productQuantity}</td>
                         <td>${product.productPrice}</td>
-                        <td>${product.purchase || ''}</td> <!-- New Purchase Column Data -->
+                        <td>${product.productPurchase || ''}</td> <!-- Use productPurchase here -->
                         <td>${product.dateAdded}</td>
                     `;
 
