@@ -7,7 +7,7 @@
 body {
     font-family: Arial, sans-serif;
     height: 100vh;
-    background-color: #f9f9f9;
+    background-color: #ecf5ff;
     color: #333;
 }
 
@@ -198,7 +198,7 @@ footer {
 
 /* General Button Styles */
 button, .btn {
-    background-color: #007bff; /* Primary blue color */
+    background-color: #e9374e; /* Primary blue color */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -210,7 +210,7 @@ button, .btn {
 }
 
 button:hover, .btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #ff1f1fe8; /* Darker blue on hover */
     transform: translateY(-2px); /* Slight lift effect */
 }
 

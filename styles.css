@@ -1,5 +1,6 @@
 /* General Layout */
 body {
+    background-color: #ecf5ff;
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* Ensure the body takes up the full viewport height */
@@ -27,7 +28,7 @@ header {
 }
 
 nav {
-    background: #333;
+    background: #434e64;
     color: #fff;
     padding: 0.5rem 0;
     text-align: center;
@@ -76,7 +77,7 @@ section {
 /* Footer */
 footer {
     text-align: center;
-    background-color: #333;
+    background-color: #434e64;
     color: white;
     padding: 10px;
     border-top: 1px solid #dee2e6;
@@ -575,30 +576,9 @@ button#addProductBtn:hover {
     display: none;
 }
 
-/* Notification Styles */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    z-index: 1000;
-    display: none;
-}
-
-.notification.success {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.notification.error {
-    background-color: #f44336;
-    color: white;
-}
 
 h3 {
-    color: #007BFF;
+    color: #419cfd;
     font-size: 25px;
     padding-left: 20px;
 
