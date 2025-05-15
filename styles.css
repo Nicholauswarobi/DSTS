@@ -432,6 +432,38 @@ button#addProductBtn:hover {
     border-radius: 5px;
 }
 
+/* Add Sales Button */
+.add-sales-btn {
+    background-color: #28a745; /* Green for Add */
+    color: white;
+    border: none;
+    padding: 10px 20px; /* Adjust padding for a balanced size */
+    font-size: 1rem; /* Set a readable font size */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    width: 100%; /* Make the button take the full width of the form */
+    text-align: center;
+}
+
+.add-sales-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+.add-sales-btn:active {
+    background-color: #1e7e34; /* Even darker green on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
+.add-sales-btn:disabled {
+    background-color: #cccccc; /* Gray for disabled state */
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
 /* Sales Table */
 .sales-table {
     margin-top: 20px;
