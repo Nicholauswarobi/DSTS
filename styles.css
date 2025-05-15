@@ -564,3 +564,10 @@ button#addProductBtn:hover {
     background-color: #f44336;
     color: white;
 }
+
+h3 {
+    color: #007BFF;
+    font-size: 25px;
+    padding-left: 20px;
+
+}
