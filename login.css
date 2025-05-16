@@ -1,14 +1,18 @@
-
 * {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
 }
 
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
+    background-color: #d3e2f1;
     margin: 0;
-    background: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .navbar {
@@ -33,13 +37,72 @@ body {
     object-fit: cover;
     display: none;
 }
-.login-container{
-    height: 88vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 
+/* Login Container */
+.login-container {
+    background-color: #e7e9f5;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 15px rgba(20, 63, 182, 0.63);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
 }
+
+.login-container h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.login-container p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Login Form */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.login-form label {
+    font-size: 0.9rem;
+    color: #333;
+    text-align: left;
+}
+
+.login-form input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.login-form input:focus {
+    border-color: #007bff;
+}
+
+/* Login Button */
+.login-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+}
+
 .container {
     width: 400px;
     height: 400px;
@@ -83,10 +146,73 @@ button  {
     color: #007bff;
     cursor: pointer;
 }
+
 .reg-log{
     padding: 20px;
 }
+
 a{
     text-decoration: none;
     color: #007bff;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.register-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Password Container */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    /* font-weight: bold; */
+    font-size: 1.1rem; /* Increase font size */
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.password-container input:focus {
+    border-color: #007bff;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #007bff;
+    user-select: none;
+}
+
+.toggle-password:hover {
+    color: #0056b3;
+}
+
+/* Style for labels */
+label {
+    font-weight: bold; /* Make labels bold */
+    font-size: 1.1rem; /* Adjust font size */
+    color: #333; /* Set label color */
+    display: block; /* Ensure labels are on their own line */
+    margin-bottom: 0px; /* Add spacing below labels */
 }

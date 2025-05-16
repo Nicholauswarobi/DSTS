@@ -1,29 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login with Profile Picture in Navbar</title>
-  <link rel="stylesheet" href="login.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Digital Sales Tracking System</title>
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
+    <div class="login-container">
+        <h1>Welcome to DSTS</h1>
+        <p>Please log in to continue</p>
+        <form class="login-form" id="loginForm">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            
+            <label for="password">Password</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <span class="toggle-password" id="togglePassword">👁️</span>
+            </div>
+            
+            <button type="submit" class="login-btn">Log In</button>
+        </form>
+        <p class="register-link">Don't have an account? <a href="Register.html">Register</a></p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
 
-<!-- Navbar -->
-<div class="navbar">
-  <h1>Digital Sales Tracking System (DSTS)</h1>
-  <img id="nav-profile-pic" class="profile-pic" src="" alt="Profile" />
-</div>
-<div class="login-container"><!-- Login/Register Form -->
-<div class="container" id="auth-section">
-    <form action="dsts.html">
-        <h2 id="form-title">Login</h2>
-  <input type="text" id="username" placeholder="Username" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <input type="file" id="profilePic" style="display: none;">
-  <button type="submit">Login</button>
-    </form>
-  
-  <div class="reg-log"><p>Don't have an account? <a href="Register.html">Register</a></p></div>  
-</div></div>
+            // Toggle password visibility
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
+            });
 
+            // Navigate to dsts.html on form submission
+            loginForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent the default form submission
+                window.location.href = 'dsts.html'; // Redirect to dsts.html
+            });
+        });
+    </script>
 </body>
 </html>
