@@ -12,6 +12,13 @@
     <header>
         <h1>Digital Sales Tracking System (DSTS)</h1>
         <p>Tailored for hardware shops in Dodoma, Tanzania</p>
+        <div class="profile-menu">
+            <img src="images/G4.png" alt="Profile Picture" class="profile-pic" id="profilePic">
+            <div class="dropdown-content hidden" id="profileMenu">
+                <a href="#">Profile Settings</a>
+                <a href="index.html">Log Out</a>
+            </div>
+        </div>
     </header>
 
     <nav>
@@ -254,6 +261,25 @@ nextMonth.addEventListener('click', () => {
 
 // Initial render
 renderCalendar();
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const profilePic = document.getElementById('profilePic');
+        const profileMenu = document.getElementById('profileMenu');
+
+        // Toggle the visibility of the menu when the profile picture is clicked
+        profilePic.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from propagating to the document
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Close the menu if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!profileMenu.contains(event.target) && event.target !== profilePic) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    });
 </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="chart.js"></script>

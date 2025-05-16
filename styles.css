@@ -20,7 +20,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; /* Stay on top */
+    z-index: 9999; /* Stay on top */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -572,10 +572,64 @@ button#addProductBtn:hover {
     opacity: 1;
 }
 
+/* Profile Menu */
+.profile-menu {
+    position: absolute; /* Position the menu relative to the page */
+    top: 20px; /* Distance from the top of the page */
+    right: 20px; /* Distance from the right of the page */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #322279;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown Menu */
+
 .hidden {
     display: none;
 }
 
+.dropdown-content {
+    /* display: none; */
+    position: absolute;
+    top: 70px; /* Position below the profile picture */
+    right: 0;
+    background-color: #3a457e91;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    overflow: visible;
+    z-index: 2000 !important; /* Ensure it appears above other elements */
+    min-width: 150px; /* Ensure the dropdown fits the content */
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 20px 15px;
+    text-decoration: none;
+    color: whitesmoke;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #3974b3;
+    color: whitesmoke;
+    border-radius: 5px;
+}
+
+/* Utility class to hide elements */
+.hidden {
+    display: none;
+}
 
 h3 {
     color: #419cfd;
