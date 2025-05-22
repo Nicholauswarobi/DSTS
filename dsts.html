@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Sales Tracking System</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="product-sales.css">
-    <link rel="stylesheet" href="calendar.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/product-sales.css">
+    <link rel="stylesheet" href="/styles/calendar.css">
     <link rel="icon" href="images/dstsICON.png" type="image/x-icon">
 
 </head>
@@ -14,6 +14,15 @@
     <header>
         <h1>Digital Sales Tracking System (DSTS)</h1>
         <p>Tailored for hardware shops in Dodoma, Tanzania</p>
+        <div class="notification-menu">
+            <button id="notificationButton" class="notification-btn">🔔</button>
+            <div class="notification-dropdown hidden" id="notificationDropdown">
+                <h4>Notifications</h4>
+                <ul id="notificationList">
+                    <!-- Notifications will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
         <div class="profile-menu">
             <img src="images/G4.png" alt="Profile Picture" class="profile-pic" id="profilePic">
             <div class="dropdown-content hidden" id="profileMenu">
@@ -279,6 +288,54 @@ renderCalendar();
         document.addEventListener('click', (event) => {
             if (!profileMenu.contains(event.target) && event.target !== profilePic) {
                 profileMenu.classList.add('hidden');
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const notificationButton = document.getElementById('notificationButton');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationList = document.getElementById('notificationList');
+
+        // Example stock data
+        const stockData = [
+            { name: 'Electric Drill', quantity: 4 },
+            { name: 'Hammer', quantity: 10 },
+            { name: 'Screwdriver Set', quantity: 3 },
+            { name: 'Paint Bucket', quantity: 6 },
+            { name: 'Measuring Tape', quantity: 2 }
+        ];
+
+        // Populate notifications
+        const populateNotifications = () => {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            stockData.forEach(stock => {
+                if (stock.quantity <= 5) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${stock.name} is low on stock (${stock.quantity} left)`;
+                    notificationList.appendChild(listItem);
+                }
+            });
+
+            if (notificationList.innerHTML === '') {
+                const noNotifications = document.createElement('li');
+                noNotifications.textContent = 'No low stock notifications';
+                notificationList.appendChild(noNotifications);
+            }
+        };
+
+        // Show/hide notification dropdown
+        notificationButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from propagating
+            notificationDropdown.classList.toggle('hidden');
+            populateNotifications(); // Populate notifications when dropdown is opened
+        });
+
+        // Close the dropdown if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!notificationDropdown.contains(event.target) && event.target !== notificationButton) {
+                notificationDropdown.classList.add('hidden');
             }
         });
     });

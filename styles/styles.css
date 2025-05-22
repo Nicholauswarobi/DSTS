@@ -626,7 +626,71 @@ button#addProductBtn:hover {
     border-radius: 5px;
 }
 
-/* Utility class to hide elements */
+/* Notification Menu */
+.notification-menu {
+    position: absolute; /* Position relative to the header */
+    top: 35px; /* Align vertically with the profile picture */
+    right: 100px; /* Place it just before the profile picture */
+    display: inline-block;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-btn:hover {
+    color: #007bff;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1000;
+    width: 250px;
+    padding: 10px;
+}
+
+.notification-dropdown h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.notification-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.notification-dropdown ul li {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown ul li:hover {
+    background-color: #f9f9f9;
+}
+
 .hidden {
     display: none;
 }
