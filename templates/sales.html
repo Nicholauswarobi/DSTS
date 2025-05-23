@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Recording</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>Sales Recording</h1>
+        <p>Record daily transactions and manage customer purchases.</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dsts') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
+            <li><a href="{{ url_for('expenses') }}">Expenses</a></li>
+            <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Button to Open Sales Form -->
+        <div class="center-button">
+            <button id="addSaleBtn">Record New Sale</button>
+        </div>
+
+        <!-- Sales Form (Initially Hidden) -->
+        <div id="salesFormContainer" class="sales-form hidden">
+            <form id="salesForm">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName" required>
+
+                <label for="productSelect">Product:</label>
+                <select id="productSelect" name="productSelect" required>
+                    <option value="">Select a product</option>
+                    <!-- Options will be dynamically added -->
+                </select>
+
+                <label for="quantityInput">Quantity:</label>
+                <input type="number" id="quantityInput" name="quantityInput" min="1" required>
+
+                <label for="priceDisplay">Price:</label>
+                <input type="text" id="priceDisplay" name="priceDisplay" readonly>
+
+                <label for="paymentMethod">Payment Method:</label>
+                <select id="paymentMethod" name="paymentMethod" required>
+                    <option value="">Select a payment method</option>
+                    <option value="cash">Cash</option>
+                    <option value="credit">Credit</option>
+                    <option value="mobile">Mobile Payment</option>
+                </select>
+
+                <button class="add-sales-btn" type="submit">Add Sale</button>
+                <button type="button" id="cancelSaleBtn">Cancel</button>
+            </form>
+        </div>
+
+        <!-- Past Sales Table -->
+        <div class="sales-table">
+            <h3>Sales Record</h3>
+            <table id="pastSalesTable">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Payment Method</th>
+                        <th>Date & Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Past sales will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 DSTS. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='scripts/sales.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addSaleBtn = document.getElementById('addSaleBtn');
+            const salesFormContainer = document.getElementById('salesFormContainer');
+            const cancelSaleBtn = document.getElementById('cancelSaleBtn');
+            const salesForm = document.getElementById('salesForm');
+
+            // Show the sales form
+            addSaleBtn.addEventListener('click', () => {
+                salesFormContainer.classList.remove('hidden');
+            });
+
+            // Hide the sales form
+            cancelSaleBtn.addEventListener('click', () => {
+                salesFormContainer.classList.add('hidden');
+            });
+
+            // Handle form submission
+            salesForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const customerName = document.getElementById('customerName').value;
+                const productSelect = document.getElementById('productSelect').value;
+                const quantityInput = document.getElementById('quantityInput').value;
+                const paymentMethod = document.getElementById('paymentMethod').value;
+
+                // Example: Save the sale to the database (replace with actual backend logic)
+                console.log({
+                    customerName,
+                    productSelect,
+                    quantityInput,
+                    paymentMethod,
+                });
+
+                // Reset the form and hide it
+                salesForm.reset();
+                salesFormContainer.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

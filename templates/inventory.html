@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Updates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
+    
+</head>
+<body>
+    <header>
+        <h1>Inventory Updates</h1>
+        <p>Track and update stock levels in real-time.</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('dsts') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
+            <li><a href="{{ url_for('expenses') }}">Expenses</a></li>
+            <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
+
+        </ul>
+    </nav>
+
+    <main>
+        <!-- <h1>Manage Inventory</h1> -->
+        <!-- <p>Add, edit, or delete products from the inventory.</p> -->
+
+        <div class="action-container">
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="addProductBtn">Add Product</button>
+                <button id="editProductBtn" disabled>Edit Product</button>
+                <button id="deleteProductBtn" disabled>Delete Product</button>
+            </div>
+
+            <!-- Search Input -->
+            <input type="text" id="searchInput" placeholder="Search products..." class="search-input">
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="table-container">
+            <h3>Inventory List</h3>
+
+            <div class="scrollable-table">
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Purchase</th>
+                            <th>Manufactured Date</th> <!-- New Column -->
+                            <th>Expired Date</th> <!-- New Column -->
+                            <th>Date Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td><input type="checkbox" class="selectRow"></td>
+                            <td>{{ product.productName }}</td>
+                            <td>{{ product.productQuantity }}</td>
+                            <td>TZS {{ "%.2f"|format(product.productPrice) }}</td>
+                            <td>TZS {{ "%.2f"|format(product.productPurchase) }}</td>
+                            <td>{{ product.manufacturedDate }}</td>
+                            <td>{{ product.expiredDate }}</td>
+                            <td>{{ product.dateAdded }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div id="addProductModal" class="modal">
+            <div class="modal-content">
+                <h3>Add Product</h3>
+                <form id="addProductForm">
+                    <label for="productName">Product Name:</label>
+                    <input type="text" id="productName" name="productName" required>
+
+                    <label for="productQuantity">Quantity:</label>
+                    <input type="number" id="productQuantity" name="productQuantity" required>
+
+                    <label for="productPrice">Price:</label>
+                    <input type="number" id="productPrice" name="productPrice" step="0.01" required>
+
+                    <label for="productPurchase">Purchase:</label>
+                    <input type="number" id="productPurchase" name="productPurchase" step="0.01" required>
+
+                    <label for="manufacturedDate">Manufactured Date:</label>
+                    <input type="date" id="manufacturedDate" name="manufacturedDate" required>
+
+                    <label for="expiredDate">Expired Date:</label>
+                    <input type="date" id="expiredDate" name="expiredDate" required>
+
+                    <button type="submit">Save Product</button>
+                    <button type="button" id="cancelAddProduct">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Product Modal -->
+        <div id="editProductModal" class="modal hidden">
+            <div class="modal-content">
+                <span id="closeEditModal" class="close">&times;</span>
+                <h2>Edit Product</h2>
+                <form id="editProductForm">
+                    <input type="hidden" id="editProductId">
+                    <label for="editProductName">Product Name:</label>
+                    <input type="text" id="editProductName" required>
+                    <label for="editProductQuantity">Quantity:</label>
+                    <input type="number" id="editProductQuantity" required>
+                    <label for="editProductPrice">Price:</label>
+                    <input type="number" id="editProductPrice" step="0.01" required>
+                    <label for="editProductPurchase">Purchase Price:</label>
+                    <input type="number" id="editProductPurchase" step="0.01" required>
+                    <label for="editManufacturedDate">Manufactured Date:</label>
+                    <input type="date" id="editManufacturedDate" required>
+                    <label for="editExpiredDate">Expired Date:</label>
+                    <input type="date" id="editExpiredDate" required>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- <footer>
+        <p>&copy; 2025 DSTS. All rights reserved.</p>
+    </footer> -->
+
+    <script src="{{ url_for('static', filename='scripts/inventory.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addProductBtn = document.getElementById('addProductBtn');
+            const addProductModal = document.getElementById('addProductModal');
+            const cancelAddProduct = document.getElementById('cancelAddProduct');
+
+            // Show the Add Product Modal
+            addProductBtn.addEventListener('click', () => {
+                addProductModal.classList.remove('hidden');
+            });
+
+            // Hide the Add Product Modal
+            cancelAddProduct.addEventListener('click', () => {
+                addProductModal.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

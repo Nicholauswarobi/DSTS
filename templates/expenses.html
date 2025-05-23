@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Expenses</title>
-<link rel="stylesheet" href="styles/expenses.css">
-<link rel="icon" href="images/dstsICON.png" type="image/x-icon">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/expenses.css') }}">
+<link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
 </head>
 <body>
 <header>
@@ -15,11 +15,10 @@
 
  <nav>
         <ul>
-
-            <li><a href="dsts.html">Dashboard</a></li>
-            <li><a href="sales.html">Sales Recording</a></li>
-            <li><a href="inventory.html">Inventory Updates</a></li>
-            <li><a href="financial.html">Financial Tracking</a></li>
+            <li><a href="{{ url_for('dsts') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
+            <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
+            <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
         </ul>
     </nav>
 

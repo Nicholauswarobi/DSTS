@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Sales Tracking System</title>
-    <link rel="stylesheet" href="/styles/styles.css">
-    <link rel="stylesheet" href="/styles/product-sales.css">
-    <link rel="stylesheet" href="/styles/calendar.css">
-    <link rel="icon" href="images/dstsICON.png" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/product-sales.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/calendar.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
 
 </head>
 <body>
@@ -24,20 +24,21 @@
             </div>
         </div>
         <div class="profile-menu">
-            <img src="images/G4.png" alt="Profile Picture" class="profile-pic" id="profilePic">
+            <img src="{{ url_for('static', filename='profilePictures/' + profile_pic) }}" alt="Profile Picture" class="profile-pic" id="profilePic">
             <div class="dropdown-content hidden" id="profileMenu">
+                <p>Logged in as: {{ username }}</p>
                 <a href="#">Profile Settings</a>
-                <a href="index.html">Log Out</a>
+                <a href="{{ url_for('index') }}">Log Out</a>
             </div>
         </div>
     </header>
 
     <nav>
         <ul>
-            <li><a href="sales.html">Sales Recording</a></li>
-            <li><a href="inventory.html">Inventory Updates</a></li>
-            <li><a href="expenses.html">Expenses</a></li>
-            <li><a href="financial.html">Financial Tracking</a></li>
+            <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
+            <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
+            <li><a href="{{ url_for('expenses') }}">Expenses</a></li>
+            <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
         </ul>
     </nav>
 

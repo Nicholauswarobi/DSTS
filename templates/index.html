@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Digital Sales Tracking System</title>
-    <link rel="stylesheet" href="styles/login.css">
-    <link rel="icon" href="images/dstsICON.png" type="image/x-icon">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
 </head>
 <body>
     <div class="login-container">
         <h1>Welcome to DSTS</h1>
         <p>Please log in to continue</p>
-        <form class="login-form" id="loginForm">
+        <form class="login-form" id="loginForm" action="/login" method="POST">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
             
@@ -24,7 +23,7 @@
             
             <button type="submit" class="login-btn">Log In</button>
         </form>
-        <p class="register-link">Don't have an account? <a href="Register.html">Register</a></p>
+        <p class="register-link">Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -37,12 +36,6 @@
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
-            });
-
-            // Navigate to dsts.html on form submission
-            loginForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // Prevent the default form submission
-                window.location.href = 'dsts.html'; // Redirect to dsts.html
             });
         });
     </script>
