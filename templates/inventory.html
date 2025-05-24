@@ -136,22 +136,5 @@
     </footer> -->
 
     <script src="{{ url_for('static', filename='scripts/inventory.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const addProductBtn = document.getElementById('addProductBtn');
-            const addProductModal = document.getElementById('addProductModal');
-            const cancelAddProduct = document.getElementById('cancelAddProduct');
-
-            // Show the Add Product Modal
-            addProductBtn.addEventListener('click', () => {
-                addProductModal.classList.remove('hidden');
-            });
-
-            // Hide the Add Product Modal
-            cancelAddProduct.addEventListener('click', () => {
-                addProductModal.classList.add('hidden');
-            });
-        });
-    </script>
 </body>
 </html>
