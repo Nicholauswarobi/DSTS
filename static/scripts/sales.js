@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('/get-sales')
             .then(response => response.json())
             .then(sales => {
+                const pastSalesTableBody = document.querySelector('#pastSalesTable tbody');
                 // Clear the table body
                 pastSalesTableBody.innerHTML = '';
 
@@ -107,17 +108,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const row = document.createElement('tr');
 
                     row.innerHTML = `
-    <td>${sale.productName}</td>
-    <td>${sale.quantitySold}</td>
-    <td>${sale.pricePerUnit.toFixed(2)}</td>
-    <td>${sale.totalPrice.toFixed(2)}</td>
-    <td>${sale.paymentMethod}</td>
-    <td>${sale.saleDate}</td>
-    <td>
-        <button class="delete-sale-btn" data-id="${sale.id}">Delete</button>
-        <button class="edit-sale-btn" data-id="${sale.id}" data-quantity="${sale.quantitySold}" data-payment="${sale.paymentMethod}">Edit</button>
-    </td>
-`;
+                        <td>${sale.productName}</td>
+                        <td>${sale.quantitySold}</td>
+                        <td>${sale.pricePerUnit.toFixed(2)}</td>
+                        <td>${sale.totalPrice.toFixed(2)}</td>
+                        <td>${sale.paymentMethod}</td>
+                        <td>${sale.saleDate}</td>
+                        <td>
+                            <button class="edit-sale-btn" data-id="${sale.id}" data-quantity="${sale.quantitySold}" data-payment="${sale.paymentMethod}">Edit</button>
+                            <button class="delete-sale-btn" data-id="${sale.id}">Delete</button>
+                        </td>
+                    `;
 
                     pastSalesTableBody.appendChild(row);
                 });
@@ -195,6 +196,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide the modal
         editSaleModal.classList.add('hidden');
     });
+
+    // Function to handle adding a product
+    function addProduct(data) {
+        fetch('/add-product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    alert(`Error: ${result.error}`);
+                } else {
+                    alert('Product added successfully!');
+                    // Reload the sales table
+                    loadSalesData();
+                }
+            })
+            .catch(error => console.error('Error adding product:', error));
+    }
 
     // Load sales data and products when the page loads
     loadSalesData();
