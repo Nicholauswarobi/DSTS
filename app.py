@@ -144,7 +144,7 @@ def register():
 
 
 
-
+# Route to handle user login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -211,10 +211,13 @@ def add_product():
 # Route for the inventory page
 @app.route('/inventory')
 def inventory():
-    # Fetch data from the database
-    cursor = db.cursor()
-    cursor.execute("SELECT id, product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added FROM products")
-    products = cursor.fetchall()
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT id, product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added FROM products")
+        products = cursor.fetchall()
+    finally:
+        cursor.close()  # Ensure the cursor is closed
+
     product_list = [
         {
             "id": row[0],
@@ -228,7 +231,6 @@ def inventory():
         }
         for row in products
     ]
-
 
     # Pass the product list to the template
     return render_template('inventory.html', products=product_list)
@@ -249,6 +251,7 @@ def expenses():
 
 
 
+# Route for the DSTS page
 @app.route('/dsts')
 def dsts():
     if 'username' not in session or 'profile_pic' not in session:
@@ -372,15 +375,16 @@ def logout():
     session.clear()  # Clear the session
     return redirect(url_for('index'))
 
+
+
+# Route to fetch products for the sales page
 @app.route('/get-products', methods=['GET'])
 def get_products():
     try:
-        cursor = db.cursor()
-        cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
-        products = cursor.fetchall()  # Fetch all results
-        cursor.close()  # Close the cursor after fetching results
+        with db.cursor() as cursor:
+            cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
+            products = cursor.fetchall()
 
-        # Convert the data into a list of dictionaries
         product_list = [
             {
                 "name": row[0],
@@ -395,6 +399,8 @@ def get_products():
         print(f"Error fetching products: {e}")
         return jsonify({'error': 'An error occurred while fetching products.'}), 500
 
+
+# Route to handle adding a sale
 @app.route('/add-sale', methods=['POST'])
 def add_sale():
     try:
@@ -441,6 +447,8 @@ def add_sale():
         print(f"Error recording sale: {e}")
         return jsonify({'error': 'An error occurred while recording the sale. Please try again.'}), 500
 
+
+# Route to fetch sales data for the sales page
 @app.route('/get-sales', methods=['GET'])
 def get_sales():
     try:
@@ -480,6 +488,8 @@ def get_sales():
         print(f"Error fetching sales: {e}")
         return jsonify({'error': 'An error occurred while fetching sales data.'}), 500
 
+
+# Route to update a sale
 @app.route('/update-sale', methods=['POST'])
 def update_sale():
     try:
@@ -534,6 +544,39 @@ def update_sale():
     except Exception as e:
         print(f"Error updating sale: {e}")  # Debugging line
         return jsonify({'error': 'An error occurred while updating the sale.'}), 500
+
+
+# Route to delete a sale
+@app.route('/delete-sale/<int:sale_id>', methods=['DELETE'])
+def delete_sale(sale_id):
+    try:
+        cursor = db.cursor()
+
+        # Fetch the sale details to restore product quantity
+        cursor.execute("SELECT product_id, quantity_sold FROM sales WHERE id = %s", (sale_id,))
+        sale = cursor.fetchone()
+
+        if not sale:
+            return jsonify({'error': 'Sale not found'}), 404
+
+        product_id, quantity_sold = sale
+
+        # Delete the sale
+        cursor.execute("DELETE FROM sales WHERE id = %s", (sale_id,))
+
+        # Restore the product quantity
+        cursor.execute(
+            "UPDATE products SET product_quantity = product_quantity + %s WHERE id = %s",
+            (quantity_sold, product_id)
+        )
+
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Sale deleted successfully!'})
+    except Exception as e:
+        print(f"Error deleting sale: {e}")
+        return jsonify({'error': 'An error occurred while deleting the sale.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

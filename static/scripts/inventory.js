@@ -213,22 +213,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Function to show the notification popup
-    const showNotification = (message) => {
+    const showNotification = (message, type = 'success') => {
         const notificationPopup = document.getElementById('notificationPopup');
         const notificationMessage = document.getElementById('notificationMessage');
+
+        // Set the message and apply the appropriate class
         notificationMessage.textContent = message;
-        notificationPopup.classList.remove('hidden');
+        notificationPopup.className = `notification ${type}`;
+        notificationPopup.classList.add('show');
+
+        // Automatically hide the notification after 3 seconds
+        setTimeout(() => {
+            notificationPopup.classList.remove('show');
+        }, 3000);
     };
 
-    // Function to hide the notification popup
-    const hideNotification = () => {
-        const notificationPopup = document.getElementById('notificationPopup');
-        notificationPopup.classList.add('hidden');
-    };
-
-    // Add event listener to close the notification popup
-    document.getElementById('closeNotification').addEventListener('click', hideNotification);
-
+   
     // Handle Add Product Form Submission
     document.getElementById('addProductForm').addEventListener('submit', async (e) => {
         e.preventDefault(); // Prevent the default form submission

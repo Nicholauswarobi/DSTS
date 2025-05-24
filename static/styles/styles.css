@@ -889,37 +889,31 @@ h3 {
 /* Notification */
 .notification {
     position: fixed;
-    top: 50%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #f8f9fa;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 2000;
-    text-align: center;
-}
-
-.notification p {
-    margin: 0 0 15px;
-    font-size: 1rem;
-    color: #333;
-}
-
-.notification button {
-    background-color: #007bff;
+    background-color: #4caf50; /* Green for success */
     color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 2000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
 }
 
-.notification button:hover {
-    background-color: #0056b3;
+.notification.error {
+    background-color: #f44336; /* Red for errors */
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
 }
 
 .hidden {
@@ -1151,3 +1145,95 @@ h3 {
 .sales-notification.error {
     background-color: #f44336; /* Red background for errors */
 }
+
+/* Delete Sale Modal */
+.delete-sale-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.delete-sale-modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.delete-sale-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.delete-sale-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.confirm-delete-sale-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-delete-sale-btn {
+    background-color: #ccc;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-delete-sale-btn:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-delete-sale-btn:hover {
+    background-color: #b0b0b0;
+}
+
+/* Inventory Notification */
+.inventory-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green for success */
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-notification.error {
+    background-color: #f44336; /* Red for errors */
+}
+
+.inventory-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+

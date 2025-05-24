@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const editQuantity = document.getElementById('editQuantity');
     const editPaymentMethod = document.getElementById('editPaymentMethod');
     const cancelEditSale = document.getElementById('cancelEditSale');
+    const deleteSaleModal = document.getElementById('deleteSaleModal');
+    const confirmDeleteSaleBtn = document.getElementById('confirmDeleteSaleBtn');
+    const cancelDeleteSaleBtn = document.getElementById('cancelDeleteSaleBtn');
+    let saleIdToDelete = null;
 
     // Show the sales form modal
     addSaleBtn.addEventListener('click', () => {
@@ -231,6 +235,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hide the modal
         editSaleModal.classList.add('hidden');
+    });
+
+    // Show the delete sale modal
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-sale-btn')) {
+            saleIdToDelete = e.target.dataset.id;
+            deleteSaleModal.classList.add('show');
+        }
+    });
+
+    // Handle the "Yes, Delete" button
+    confirmDeleteSaleBtn.addEventListener('click', () => {
+        if (!saleIdToDelete) return;
+
+        fetch(`/delete-sale/${saleIdToDelete}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showSalesNotification(`Error: ${data.error}`, 'error');
+                } else {
+                    showSalesNotification('Sale deleted successfully!');
+                    // Reload the sales table and product dropdown
+                    loadSalesData();
+                    loadProducts();
+                }
+            })
+            .catch(error => console.error('Error deleting sale:', error))
+            .finally(() => {
+                // Hide the modal
+                deleteSaleModal.classList.remove('show');
+                saleIdToDelete = null;
+            });
+    });
+
+    // Handle the "Cancel" button
+    cancelDeleteSaleBtn.addEventListener('click', () => {
+        deleteSaleModal.classList.remove('show');
+        saleIdToDelete = null;
+    });
+
+    // Close the modal when clicking outside the modal content
+    window.addEventListener('click', (e) => {
+        if (e.target === deleteSaleModal) {
+            deleteSaleModal.classList.remove('show');
+            saleIdToDelete = null;
+        }
     });
 
     // Load sales data and products when the page loads
