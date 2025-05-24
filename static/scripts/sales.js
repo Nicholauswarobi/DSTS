@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const addSaleBtn = document.getElementById('addSaleBtn');
-    const salesFormContainer = document.getElementById('salesFormContainer');
+    const salesFormModal = document.getElementById('salesFormModal');
     const cancelSaleBtn = document.getElementById('cancelSaleBtn');
     const salesForm = document.getElementById('salesForm');
     const productSelect = document.getElementById('productSelect');
@@ -14,14 +14,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const editPaymentMethod = document.getElementById('editPaymentMethod');
     const cancelEditSale = document.getElementById('cancelEditSale');
 
-    // Show the sales form
+    // Show the sales form modal
     addSaleBtn.addEventListener('click', () => {
-        salesFormContainer.classList.remove('hidden');
+        salesFormModal.classList.remove('hidden');
     });
 
-    // Hide the sales form
+    // Hide the sales form modal
     cancelSaleBtn.addEventListener('click', () => {
-        salesFormContainer.classList.add('hidden');
+        salesFormModal.classList.add('hidden');
+    });
+
+    // Close the modal when clicking outside the modal content
+    window.addEventListener('click', (e) => {
+        if (e.target === salesFormModal) {
+            salesFormModal.classList.add('hidden');
+        }
     });
 
     // Function to fetch and populate the product dropdown
@@ -53,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     salesForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const productData = JSON.parse(productSelect.value);
+        const productData = JSON.parse(document.getElementById('productSelect').value);
         const quantityInput = document.getElementById('quantityInput').value;
         const paymentMethod = document.getElementById('paymentMethod').value;
 
@@ -89,9 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => console.error('Error saving sale:', error));
 
-        // Reset the form and hide it
+        // Reset the form and hide the modal
         salesForm.reset();
-        salesFormContainer.classList.add('hidden');
+        salesFormModal.classList.add('hidden');
     });
 
     // Function to fetch and display sales data

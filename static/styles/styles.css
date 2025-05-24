@@ -1034,3 +1034,90 @@ h3 {
 .edit-sale-modal .close:hover {
     color: red; /* Red color on hover */
 }
+
+/* Sales Form Modal */
+.sales-form-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 10000; /* Ensure it appears above other elements */
+}
+
+.sales-form-modal.hidden {
+    display: none;
+}
+
+.sales-form-modal:not(.hidden) {
+    display: flex;
+}
+
+.sales-form-modal-content {
+    background: #ffffff; /* White background for the modal */
+    padding: 30px; /* Add padding for spacing */
+    border-radius: 10px; /* Rounded corners */
+    width: 450px; /* Fixed width */
+    max-width: 90%; /* Ensure it fits smaller screens */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    position: relative;
+    z-index: 10001; /* Ensure the modal content is above the modal background */
+}
+
+/* Modal Header */
+.sales-form-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Modal Form Inputs and Buttons */
+.sales-form-modal-content input,
+.sales-form-modal-content select,
+.sales-form-modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Focus Effect for Inputs and Selects */
+.sales-form-modal-content input:focus,
+.sales-form-modal-content select:focus {
+    outline: none;
+    border-color: #007bff; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Modal Buttons */
+.sales-form-modal-content button {
+    background-color: #007bff; /* Blue background */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.sales-form-modal-content button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Cancel Button */
+.sales-form-modal-content button[type="button"] {
+    background-color: #6c757d; /* Gray for cancel button */
+}
+
+.sales-form-modal-content button[type="button"]:hover {
+    background-color: #5a6268; /* Darker gray on hover */
+}
