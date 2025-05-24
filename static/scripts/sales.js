@@ -137,9 +137,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('edit-sale-btn')) {
             const saleId = e.target.dataset.id;
-            console.log('Sale ID:', saleId); // Debugging line
             const quantity = e.target.dataset.quantity;
             const paymentMethod = e.target.dataset.payment;
+
+            // Debugging: Log the saleId
+            console.log('Sale ID:', saleId);
+
+            if (!saleId || saleId === "undefined") {
+                alert("Sale ID is missing.");
+                return;
+            }
 
             // Populate the modal fields
             document.getElementById('editSaleId').value = saleId;
@@ -172,9 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
     editSaleForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const saleId = editSaleId.value;
-        const quantity = editQuantity.value;
-        const paymentMethod = editPaymentMethod.value;
+        const saleId = document.getElementById('editSaleId').value;
+        const quantity = document.getElementById('editQuantity').value;
+        const paymentMethod = document.getElementById('editPaymentMethod').value;
+
+        // Debugging: Log the values being sent
+        console.log('Submitting:', { saleId, quantity, paymentMethod });
 
         fetch('/update-sale', {
             method: 'POST',
@@ -195,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Sale updated successfully!');
                     // Reload the sales table and product dropdown
                     loadSalesData();
-                    loadProducts();
+                    loadProducts(); // Refresh the product dropdown
                 }
             })
             .catch(error => console.error('Error updating sale:', error));

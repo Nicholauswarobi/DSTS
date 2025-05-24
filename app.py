@@ -377,8 +377,8 @@ def get_products():
     try:
         cursor = db.cursor()
         cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
-        products = cursor.fetchall()
-        cursor.close()
+        products = cursor.fetchall()  # Fetch all results
+        cursor.close()  # Close the cursor after fetching results
 
         # Convert the data into a list of dictionaries
         product_list = [
@@ -447,6 +447,7 @@ def get_sales():
         cursor = db.cursor()
         cursor.execute("""
             SELECT 
+                s.id,  -- Include sale ID
                 p.product_name, 
                 s.quantity_sold, 
                 s.total_price / s.quantity_sold AS price_per_unit, 
@@ -463,12 +464,13 @@ def get_sales():
         # Convert the data into a list of dictionaries
         sales_list = [
             {
-                "productName": row[0],
-                "quantitySold": row[1],
-                "pricePerUnit": float(row[2]),
-                "totalPrice": float(row[3]),
-                "paymentMethod": row[4],
-                "saleDate": row[5].strftime('%Y-%m-%d %H:%M:%S') if row[5] else ''
+                "id": row[0],  # Include sale ID
+                "productName": row[1],
+                "quantitySold": row[2],
+                "pricePerUnit": float(row[3]),
+                "totalPrice": float(row[4]),
+                "paymentMethod": row[5],
+                "saleDate": row[6].strftime('%Y-%m-%d %H:%M:%S') if row[6] else ''
             }
             for row in sales
         ]
@@ -481,10 +483,17 @@ def get_sales():
 @app.route('/update-sale', methods=['POST'])
 def update_sale():
     try:
-        data = request.json
-        sale_id = data['saleId']
-        new_quantity = int(data['quantity'])
-        new_payment_method = data['paymentMethod']
+        # Parse JSON data from the request
+        data = request.get_json()
+        print(f"Received data: {data}")  # Debugging line
+
+        # Validate and extract inputs
+        try:
+            sale_id = int(data.get('saleId'))
+            new_quantity = int(data.get('quantity'))
+            new_payment_method = data.get('paymentMethod')
+        except (TypeError, ValueError):
+            return jsonify({'error': 'Invalid data format'}), 400
 
         cursor = db.cursor()
 
@@ -523,7 +532,7 @@ def update_sale():
 
         return jsonify({'message': 'Sale updated successfully!'})
     except Exception as e:
-        print(f"Error updating sale: {e}")
+        print(f"Error updating sale: {e}")  # Debugging line
         return jsonify({'error': 'An error occurred while updating the sale.'}), 500
 
 if __name__ == '__main__':
