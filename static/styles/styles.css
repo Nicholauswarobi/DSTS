@@ -1121,3 +1121,33 @@ h3 {
 .sales-form-modal-content button[type="button"]:hover {
     background-color: #5a6268; /* Darker gray on hover */
 }
+
+/* Sales Notification */
+.sales-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green background for success */
+    color: #fff; /* White text */
+    padding: 20px 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.sales-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+.sales-notification.error {
+    background-color: #f44336; /* Red background for errors */
+}

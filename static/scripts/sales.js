@@ -86,9 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(`Error: ${data.error}`);
+                    showSalesNotification(`Error: ${data.error}`, 'error');
                 } else {
-                    alert('Sale recorded successfully!');
+                    showSalesNotification('Sale recorded successfully!');
                     // Reload the sales table and product dropdown
                     loadSalesData();
                     loadProducts();
@@ -175,6 +175,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Function to handle adding a product
+    function addProduct(data) {
+        fetch('/add-product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    showSalesNotification(`Error: ${result.error}`, 'error');
+                } else {
+                    showSalesNotification('Product added successfully!');
+                    // Reload the sales table
+                    loadSalesData();
+                }
+            })
+            .catch(error => console.error('Error adding product:', error));
+    }
+
     // Handle edit form submission
     editSaleForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -182,9 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const saleId = document.getElementById('editSaleId').value;
         const quantity = document.getElementById('editQuantity').value;
         const paymentMethod = document.getElementById('editPaymentMethod').value;
-
-        // Debugging: Log the values being sent
-        console.log('Submitting:', { saleId, quantity, paymentMethod });
 
         fetch('/update-sale', {
             method: 'POST',
@@ -200,12 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert(`Error: ${data.error}`);
+                    showSalesNotification(`Error: ${data.error}`, 'error');
                 } else {
-                    alert('Sale updated successfully!');
+                    showSalesNotification('Sale updated successfully!');
                     // Reload the sales table and product dropdown
                     loadSalesData();
-                    loadProducts(); // Refresh the product dropdown
+                    loadProducts();
                 }
             })
             .catch(error => console.error('Error updating sale:', error));
@@ -214,29 +233,26 @@ document.addEventListener('DOMContentLoaded', () => {
         editSaleModal.classList.add('hidden');
     });
 
-    // Function to handle adding a product
-    function addProduct(data) {
-        fetch('/add-product', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.error) {
-                    alert(`Error: ${result.error}`);
-                } else {
-                    alert('Product added successfully!');
-                    // Reload the sales table
-                    loadSalesData();
-                }
-            })
-            .catch(error => console.error('Error adding product:', error));
-    }
-
     // Load sales data and products when the page loads
     loadSalesData();
     loadProducts();
+
+    // Function to show sales notifications
+    function showSalesNotification(message, type = 'success') {
+        const notification = document.getElementById('salesNotification');
+        if (!notification) {
+            console.error('Notification container not found!');
+            return;
+        }
+
+        // Set the message and apply the appropriate class
+        notification.textContent = message;
+        notification.className = `sales-notification ${type}`;
+        notification.classList.add('show');
+
+        // Hide the notification after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
 });
