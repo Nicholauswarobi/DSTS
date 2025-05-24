@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import MySQLdb
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
 app = Flask(__name__)
@@ -94,28 +95,41 @@ def allowed_file(filename):
 # Route for registering a user
 @app.route('/register', methods=['POST'])
 def handle_register():
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
-    profile_pic = request.files['profilePic']
+    try:
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        profile_pic = request.files['profilePic']
 
-    # Save the profile picture to the static/profilePictures folder
-    if profile_pic and allowed_file(profile_pic.filename):
-        filename = secure_filename(profile_pic.filename)
-        profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    else:
-        return "Invalid file type for profile picture", 400
+        # Save the profile picture to the static/profilePictures folder
+        if profile_pic and allowed_file(profile_pic.filename):
+            filename = secure_filename(profile_pic.filename)
+            profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        else:
+            return jsonify({'error': 'Invalid file type for profile picture'}), 400
 
-    # Insert user data into the database, including the profile picture filename
-    cursor = db.cursor()
-    cursor.execute(
-        "INSERT INTO users (username, email, password, profile_pic) VALUES (%s, %s, %s, %s)",
-        (username, email, password, filename)
-    )
-    db.commit()
-    cursor.close()
+        # Check if the username or email already exists
+        cursor = db.cursor()
+        cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            return jsonify({'error': 'Username or email already exists'}), 400
 
-    return redirect(url_for('index'))
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        # Insert user data into the database
+        cursor.execute(
+            "INSERT INTO users (username, email, password, profile_pic) VALUES (%s, %s, %s, %s)",
+            (username, email, hashed_password, filename)
+        )
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Registration successful!'}), 201
+    except Exception as e:
+        print(f"Error during registration: {e}")
+        return jsonify({'error': 'An error occurred during registration. Please try again.'}), 500
 
 # Route for the homepage
 @app.route('/')
@@ -130,27 +144,34 @@ def register():
 
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    if request.method == 'GET':
+        # Render the login page
+        return render_template('index.html')  # Ensure 'index.html' is your login page template
 
-    # Validate user credentials against the database
-    cursor = db.cursor()
-    cursor.execute("SELECT username, profile_pic FROM users WHERE username = %s AND password = %s", (username, password))
-    user = cursor.fetchone()
-    cursor.close()
+    if request.method == 'POST':
+        try:
+            username = request.json.get('username')  # Ensure you're using JSON data
+            password = request.json.get('password')
 
-    if user:
-        # Store the username and profile_pic in the session
-        session['username'] = user[0]
-        session['profile_pic'] = user[1] if user[1] else 'default.png'  # Use 'default.png' if no profile picture is set
+            # Validate user credentials against the database
+            cursor = db.cursor()
+            cursor.execute("SELECT username, password, profile_pic FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            cursor.close()
 
-        # Redirect to the dashboard
-        return redirect(url_for('dsts'))
-    else:
-        # Invalid credentials
-        return "Invalid username or password", 401
+            if user and check_password_hash(user[1], password):  # Use hashed password verification
+                # Store the username and profile_pic in the session
+                session['username'] = user[0]
+                session['profile_pic'] = user[2] if user[2] else 'default.png'  # Use 'default.png' if no profile picture is set
+
+                return jsonify({'message': 'Login successful!'}), 200
+            else:
+                return jsonify({'error': 'Invalid username or password'}), 401
+        except Exception as e:
+            print(f"Error during login: {e}")  # Debugging log
+            return jsonify({'error': 'An error occurred during login. Please try again.'}), 500
 
 
 
@@ -159,25 +180,29 @@ def login():
 # Route to handle adding a product
 @app.route('/add-product', methods=['POST'])
 def add_product():
-    data = request.json
-    product_name = data['productName']
-    product_quantity = data['productQuantity']
-    product_price = data['productPrice']
-    product_purchase = data['productPurchase']
-    manufactured_date = data['manufacturedDate']
-    expired_date = data['expiredDate']
-    date_added = datetime.datetime.now().strftime('%Y-%m-%d')
+    try:
+        data = request.json
+        product_name = data['productName']
+        product_quantity = data['productQuantity']
+        product_price = data['productPrice']
+        product_purchase = data['productPurchase']
+        manufactured_date = data['manufacturedDate']
+        expired_date = data['expiredDate']
+        date_added = datetime.datetime.now().strftime('%Y-%m-%d')
 
-    # Save the product to the database
-    cursor = db.cursor()
-    cursor.execute(
-        "INSERT INTO products (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added)
-    )
-    db.commit()
-    cursor.close()
+        # Save the product to the database
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO products (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added)
+        )
+        db.commit()
+        cursor.close()
 
-    return jsonify({'message': 'Product added successfully!'})
+        return jsonify({'message': 'Product added successfully!'})
+    except Exception as e:
+        print(f"Error adding product: {e}")
+        return jsonify({'error': 'An error occurred while adding the product. Please try again.'}), 500
 
 
 
@@ -340,6 +365,11 @@ def get_product_details(product_id):
 
 # Secret key for session management
 app.secret_key = os.urandom(24)  # Generates a random 24-byte key
+
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear the session
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Digital Sales Tracking System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
 </head>
 <body>
   <div class="login-container">
     <h1>Welcome to DSTS</h1>
     <p>Create an account to get started</p>
-    <form class="login-form" id="registerForm" action="/register" method="POST" enctype="multipart/form-data">
+
+    <!-- Registration Form -->
+    <form id="registerForm" action="/register" method="POST" enctype="multipart/form-data">
       <label for="username">Username</label>
       <input type="text" id="username" name="username" placeholder="Enter your username" required>
       
@@ -35,43 +37,80 @@
       
       <button type="submit" class="login-btn">Register</button>
     </form>
+
     <p class="register-link">Already have an account? <a href="{{ url_for('index') }}">Log In</a></p>
+  </div>
+
+  <!-- Notification Popup -->
+  <div id="notificationPopup" class="notification hidden">
+    <p id="notificationMessage"></p>
+    <button id="closeNotification">Close</button>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const togglePassword1 = document.getElementById('togglePassword1');
-      const passwordInput1 = document.getElementById('password');
-      const togglePassword2 = document.getElementById('togglePassword2');
-      const passwordInput2 = document.getElementById('confirmPassword');
-      const registerForm = document.getElementById('registerForm');
+      // Toggle Password Visibility
+      const togglePasswordVisibility = (toggleButton, passwordInput) => {
+        toggleButton.addEventListener('click', () => {
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          toggleButton.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+      };
 
-      // Toggle visibility for the first password field
-      togglePassword1.addEventListener('click', () => {
-        const type = passwordInput1.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput1.setAttribute('type', type);
-        togglePassword1.textContent = type === 'password' ? '👁️' : '🙈';
-      });
+      togglePasswordVisibility(document.getElementById('togglePassword1'), document.getElementById('password'));
+      togglePasswordVisibility(document.getElementById('togglePassword2'), document.getElementById('confirmPassword'));
 
-      // Toggle visibility for the confirm password field
-      togglePassword2.addEventListener('click', () => {
-        const type = passwordInput2.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput2.setAttribute('type', type);
-        togglePassword2.textContent = type === 'password' ? '👁️' : '🙈';
-      });
+      // Handle Registration Form Submission
+      document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      // Validate form before submission
-      registerForm.addEventListener('submit', (event) => {
-        const password = passwordInput1.value;
-        const confirmPassword = passwordInput2.value;
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-        // Check if passwords match
         if (password !== confirmPassword) {
-          alert('Passwords do not match!');
-          event.preventDefault(); // Prevent form submission
-          return;
+            showNotification('Passwords do not match. Please try again.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                body: new FormData(document.getElementById('registerForm')), // Send form data
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showNotification(data.message || 'Registration successful!');
+                setTimeout(() => {
+                    window.location.href = '/login'; // Redirect to login page
+                }, 2000); // Wait 2 seconds before redirecting
+            } else {
+                const errorData = await response.json();
+                showNotification(errorData.error || 'Registration failed. Please try again.');
+            }
+        } catch (error) {
+            console.error(error);
+            showNotification('An error occurred during registration. Please try again.');
         }
       });
+
+      // Notification Popup Functions
+      const showNotification = (message) => {
+        const notificationPopup = document.getElementById('notificationPopup');
+        const notificationMessage = document.getElementById('notificationMessage');
+        notificationMessage.textContent = message;
+        notificationPopup.classList.remove('hidden');
+      };
+
+      const hideNotification = () => {
+        const notificationPopup = document.getElementById('notificationPopup');
+        notificationPopup.classList.add('hidden');
+      };
+
+      document.getElementById('closeNotification').addEventListener('click', hideNotification);
     });
   </script>
 </body>

@@ -11,7 +11,9 @@
     <div class="login-container">
         <h1>Welcome to DSTS</h1>
         <p>Please log in to continue</p>
-        <form class="login-form" id="loginForm" action="/login" method="POST">
+
+        <!-- Login Form -->
+        <form id="loginForm" action="/login" method="POST">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
             
@@ -23,11 +25,18 @@
             
             <button type="submit" class="login-btn">Log In</button>
         </form>
+
         <p class="register-link">Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
     </div>
+
+    <!-- Notification Popup -->
+    <div id="notificationPopup" class="notification hidden">
+        <p id="notificationMessage"></p>
+        <button id="closeNotification">Close</button>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
             const togglePassword = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('password');
 
@@ -37,6 +46,51 @@
                 passwordInput.setAttribute('type', type);
                 togglePassword.textContent = type === 'password' ? '👁️' : '🙈';
             });
+
+            // Handle Login Form Submission
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }), // Send JSON data
+                    });
+
+                    if (response.ok) {
+                        showNotification('Login successful!');
+                        setTimeout(() => {
+                            window.location.href = '/dsts'; // Redirect to dashboard
+                        }, 2000);
+                    } else {
+                        const errorData = await response.json();
+                        showNotification(errorData.error || 'Invalid username or password. Please try again.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showNotification('An error occurred during login. Please try again.');
+                }
+            });
+
+            // Notification Popup Functions
+            const showNotification = (message) => {
+                const notificationPopup = document.getElementById('notificationPopup');
+                const notificationMessage = document.getElementById('notificationMessage');
+                notificationMessage.textContent = message;
+                notificationPopup.classList.remove('hidden');
+            };
+
+            const hideNotification = () => {
+                const notificationPopup = document.getElementById('notificationPopup');
+                notificationPopup.classList.add('hidden');
+            };
+
+            // Add event listener to close the notification popup
+            document.getElementById('closeNotification').addEventListener('click', hideNotification);
         });
     </script>
 </body>

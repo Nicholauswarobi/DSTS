@@ -79,14 +79,14 @@ deleteProductBtn.addEventListener('click', async () => {
                         method: 'DELETE',
                     });
                 }
-                alert('Product(s) deleted successfully!');
+                showNotification('Product(s) deleted successfully!');
                 populateInventoryTable(); // Refresh the table
             } catch (error) {
-                alert('Failed to delete product(s). Please try again.');
+                showNotification('Failed to delete product(s). Please try again.');
             }
         }
     } else {
-        alert('Please select at least one product to delete.');
+        showNotification('Please select at least one product to delete.');
     }
 });
 
@@ -212,6 +212,23 @@ document.addEventListener('DOMContentLoaded', () => {
         editProductModal.style.display = 'none'; // Hide the Edit Product modal
     });
 
+    // Function to show the notification popup
+    const showNotification = (message) => {
+        const notificationPopup = document.getElementById('notificationPopup');
+        const notificationMessage = document.getElementById('notificationMessage');
+        notificationMessage.textContent = message;
+        notificationPopup.classList.remove('hidden');
+    };
+
+    // Function to hide the notification popup
+    const hideNotification = () => {
+        const notificationPopup = document.getElementById('notificationPopup');
+        notificationPopup.classList.add('hidden');
+    };
+
+    // Add event listener to close the notification popup
+    document.getElementById('closeNotification').addEventListener('click', hideNotification);
+
     // Handle Add Product Form Submission
     document.getElementById('addProductForm').addEventListener('submit', async (e) => {
         e.preventDefault(); // Prevent the default form submission
@@ -240,22 +257,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                alert('Product added successfully!');
+                showNotification('Product added successfully!');
                 addProductModal.style.display = 'none';
                 addProductForm.reset();
                 await populateInventoryTable(); // Reload the table to apply changes
             } else {
-                alert('Failed to add product. Please try again.');
+                showNotification('Failed to add product. Please try again.');
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred while adding the product. Please try again.');
+            showNotification('An error occurred while adding the product. Please try again.');
         }
     });
 
     // Handle Edit Product Form Submission
     document.getElementById('editProductForm').addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent the default form submission
+        e.preventDefault();
 
         const productId = document.getElementById('editProductId').value;
         const productName = document.getElementById('editProductName').value;
@@ -280,15 +297,39 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                alert('Product updated successfully!');
-                document.getElementById('editProductModalContainer').style.display = 'none'; // Hide the modal
+                showNotification('Product updated successfully!');
+                editProductModal.style.display = 'none';
                 populateInventoryTable(); // Refresh the table
             } else {
-                alert('Failed to update product. Please try again.');
+                showNotification('Failed to update product. Please try again.');
             }
         } catch (error) {
             console.error(error);
-            alert('An error occurred while updating the product. Please try again.');
+            showNotification('An error occurred while updating the product. Please try again.');
+        }
+    });
+
+    deleteProductBtn.addEventListener('click', async () => {
+        const selectedRows = document.querySelectorAll('.selectRow:checked');
+        if (selectedRows.length > 0) {
+            const confirmDelete = confirm(`Are you sure you want to delete ${selectedRows.length} product(s)?`);
+            if (confirmDelete) {
+                const productIds = Array.from(selectedRows).map(row => row.closest('tr').dataset.productId);
+
+                try {
+                    for (const productId of productIds) {
+                        await fetch(`/delete-product/${productId}`, {
+                            method: 'DELETE',
+                        });
+                    }
+                    showNotification('Product(s) deleted successfully!');
+                    populateInventoryTable();
+                } catch (error) {
+                    showNotification('Failed to delete product(s). Please try again.');
+                }
+            }
+        } else {
+            showNotification('Please select at least one product to delete.');
         }
     });
 });
