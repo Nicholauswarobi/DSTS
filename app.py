@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS sales (
     product_id INT NOT NULL,
     quantity_sold INT NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
     sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 )
@@ -370,6 +371,160 @@ app.secret_key = os.urandom(24)  # Generates a random 24-byte key
 def logout():
     session.clear()  # Clear the session
     return redirect(url_for('index'))
+
+@app.route('/get-products', methods=['GET'])
+def get_products():
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
+        products = cursor.fetchall()
+        cursor.close()
+
+        # Convert the data into a list of dictionaries
+        product_list = [
+            {
+                "name": row[0],
+                "quantity": row[1],
+                "price": float(row[2])
+            }
+            for row in products
+        ]
+
+        return jsonify(product_list)
+    except Exception as e:
+        print(f"Error fetching products: {e}")
+        return jsonify({'error': 'An error occurred while fetching products.'}), 500
+
+@app.route('/add-sale', methods=['POST'])
+def add_sale():
+    try:
+        data = request.json
+        product_name = data['productName']
+        quantity = int(data['quantity'])
+        price = float(data['price'])
+        payment_method = data['paymentMethod']
+
+        # Fetch the product ID and available quantity
+        cursor = db.cursor()
+        cursor.execute("SELECT id, product_quantity FROM products WHERE product_name = %s", (product_name,))
+        product = cursor.fetchone()
+
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        product_id, available_quantity = product
+
+        # Check if the quantity is valid
+        if quantity > available_quantity:
+            return jsonify({'error': 'Insufficient stock available'}), 400
+
+        # Calculate the total price
+        total_price = quantity * price
+
+        # Insert the sale into the sales table
+        cursor.execute(
+            "INSERT INTO sales (product_id, quantity_sold, total_price, payment_method) VALUES (%s, %s, %s, %s)",
+            (product_id, quantity, total_price, payment_method)
+        )
+
+        # Update the product quantity in the products table
+        cursor.execute(
+            "UPDATE products SET product_quantity = product_quantity - %s WHERE id = %s",
+            (quantity, product_id)
+        )
+
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Sale recorded successfully!'})
+    except Exception as e:
+        print(f"Error recording sale: {e}")
+        return jsonify({'error': 'An error occurred while recording the sale. Please try again.'}), 500
+
+@app.route('/get-sales', methods=['GET'])
+def get_sales():
+    try:
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT 
+                p.product_name, 
+                s.quantity_sold, 
+                s.total_price / s.quantity_sold AS price_per_unit, 
+                s.total_price, 
+                s.payment_method, 
+                s.sale_date 
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            ORDER BY s.sale_date DESC
+        """)
+        sales = cursor.fetchall()
+        cursor.close()
+
+        # Convert the data into a list of dictionaries
+        sales_list = [
+            {
+                "productName": row[0],
+                "quantitySold": row[1],
+                "pricePerUnit": float(row[2]),
+                "totalPrice": float(row[3]),
+                "paymentMethod": row[4],
+                "saleDate": row[5].strftime('%Y-%m-%d %H:%M:%S') if row[5] else ''
+            }
+            for row in sales
+        ]
+
+        return jsonify(sales_list)
+    except Exception as e:
+        print(f"Error fetching sales: {e}")
+        return jsonify({'error': 'An error occurred while fetching sales data.'}), 500
+
+@app.route('/update-sale', methods=['POST'])
+def update_sale():
+    try:
+        data = request.json
+        sale_id = data['saleId']
+        new_quantity = int(data['quantity'])
+        new_payment_method = data['paymentMethod']
+
+        cursor = db.cursor()
+
+        # Fetch the original sale data
+        cursor.execute("""
+            SELECT product_id, quantity_sold 
+            FROM sales 
+            WHERE id = %s
+        """, (sale_id,))
+        sale = cursor.fetchone()
+
+        if not sale:
+            return jsonify({'error': 'Sale not found'}), 404
+
+        product_id, old_quantity = sale
+
+        # Update the product quantity in the products table
+        quantity_difference = new_quantity - old_quantity
+        cursor.execute("""
+            UPDATE products 
+            SET product_quantity = product_quantity - %s 
+            WHERE id = %s
+        """, (quantity_difference, product_id))
+
+        # Update the sale record
+        cursor.execute("""
+            UPDATE sales 
+            SET quantity_sold = %s, 
+                total_price = (SELECT product_price FROM products WHERE id = %s) * %s,
+                payment_method = %s
+            WHERE id = %s
+        """, (new_quantity, product_id, new_quantity, new_payment_method, sale_id))
+
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Sale updated successfully!'})
+    except Exception as e:
+        print(f"Error updating sale: {e}")
+        return jsonify({'error': 'An error occurred while updating the sale.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

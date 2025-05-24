@@ -1,167 +1,202 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const addSaleBtn = document.getElementById('addSaleBtn');
     const salesFormContainer = document.getElementById('salesFormContainer');
+    const cancelSaleBtn = document.getElementById('cancelSaleBtn');
     const salesForm = document.getElementById('salesForm');
     const productSelect = document.getElementById('productSelect');
-    const quantityInput = document.getElementById('quantityInput');
     const priceDisplay = document.getElementById('priceDisplay');
-    const pastSalesTable = document.getElementById('pastSalesTable').querySelector('tbody');
+    const pastSalesTableBody = document.querySelector('#pastSalesTable tbody');
+    const editSaleModal = document.getElementById('editSaleModal');
+    const closeEditSaleModal = document.getElementById('closeEditSaleModal');
+    const editSaleForm = document.getElementById('editSaleForm');
+    const editSaleId = document.getElementById('editSaleId');
+    const editQuantity = document.getElementById('editQuantity');
+    const editPaymentMethod = document.getElementById('editPaymentMethod');
+    const cancelEditSale = document.getElementById('cancelEditSale');
 
-    // Retrieve products from localStorage
-    const stockData = JSON.parse(localStorage.getItem('products')) || [];
-
-    // Example past sales data (replace with actual data from localStorage)
-    const pastSales = JSON.parse(localStorage.getItem('sales')) || [];
-
-    // Populate product dropdown
-    const populateProductDropdown = () => {
-        productSelect.innerHTML = '<option value="">Select a product</option>';
-        stockData.forEach((product) => {
-            if (product.productQuantity > 0) {
-                const option = document.createElement('option');
-                option.value = product.productName;
-                option.textContent = `${product.productName} (Remaining: ${product.productQuantity})`;
-                option.dataset.price = product.productPrice;
-                option.dataset.remainingStock = product.productQuantity; // Store remaining stock in the option
-                productSelect.appendChild(option);
-            }
-        });
-    };
-
-    // Populate past sales table
-    const populatePastSalesTable = () => {
-        pastSalesTable.innerHTML = '';
-        pastSales.forEach((sale, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${sale.productName}</td>
-                <td>${sale.quantity}</td>
-                <td>TSH ${sale.price.toFixed(2)}</td>
-                <td>TSH ${(sale.quantity * sale.price).toFixed(2)}</td>
-                <td>${sale.date} ${sale.time}</td>
-                <td>
-                    <button class="edit-sale-btn" data-index="${index}">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="delete-sale-btn" data-index="${index}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </td>
-            `;
-            pastSalesTable.appendChild(row);
-        });
-
-        // Attach event listeners to Edit and Delete buttons
-        document.querySelectorAll('.edit-sale-btn').forEach((button) => {
-            button.addEventListener('click', handleEditSale);
-        });
-
-        document.querySelectorAll('.delete-sale-btn').forEach((button) => {
-            button.addEventListener('click', handleDeleteSale);
-        });
-    };
-
-    // Handle Edit Sale
-    const handleEditSale = (e) => {
-        const saleIndex = e.target.closest('button').dataset.index;
-        const sale = pastSales[saleIndex];
-
-        // Populate the sales form with the selected sale's data
-        productSelect.value = sale.productName;
-        quantityInput.value = sale.quantity;
-        priceDisplay.value = sale.price;
-
-        // Store the index of the sale being edited
-        salesForm.dataset.editIndex = saleIndex;
-
-        // Show the sales form for editing
-        salesFormContainer.classList.remove('hidden');
-    };
-
-    // Handle Delete Sale
-    const handleDeleteSale = (e) => {
-        const saleIndex = e.target.dataset.index;
-
-        // Confirm deletion
-        const confirmDelete = confirm('Are you sure you want to delete this sale?');
-        if (confirmDelete) {
-            // Remove the sale from the array and update localStorage
-            pastSales.splice(saleIndex, 1);
-            localStorage.setItem('sales', JSON.stringify(pastSales));
-
-            // Refresh the table
-            populatePastSalesTable();
-        }
-    };
-
-    // Show sales form on button click
+    // Show the sales form
     addSaleBtn.addEventListener('click', () => {
-        salesFormContainer.classList.toggle('hidden');
-        populateProductDropdown();
+        salesFormContainer.classList.remove('hidden');
     });
 
-    // Update price when product is selected
+    // Hide the sales form
+    cancelSaleBtn.addEventListener('click', () => {
+        salesFormContainer.classList.add('hidden');
+    });
+
+    // Function to fetch and populate the product dropdown
+    function loadProducts() {
+        fetch('/get-products')
+            .then(response => response.json())
+            .then(products => {
+                // Clear the dropdown
+                productSelect.innerHTML = '<option value="">Select a product</option>';
+
+                // Populate the dropdown with products
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(product); // Store product data as JSON string
+                    option.textContent = `${product.name} (Available: ${product.quantity})`;
+                    productSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
+
+    // Update price display when a product is selected
     productSelect.addEventListener('change', () => {
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        priceDisplay.value = selectedOption.dataset.price || '';
+        const selectedProduct = JSON.parse(productSelect.value);
+        priceDisplay.value = selectedProduct ? selectedProduct.price : '';
     });
 
     // Handle form submission
     salesForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        const productName = productSelect.value;
-        const quantity = parseInt(quantityInput.value, 10);
-        const price = parseFloat(priceDisplay.value);
+        const productData = JSON.parse(productSelect.value);
+        const quantityInput = document.getElementById('quantityInput').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
 
-        if (!productName || quantity <= 0 || isNaN(price)) {
-            alert('Please fill out all fields correctly.');
+        // Validate quantity
+        if (quantityInput > productData.quantity) {
+            alert('Insufficient stock available!');
             return;
         }
 
-        // Check if editing an existing sale
-        const editIndex = salesForm.dataset.editIndex;
-        if (editIndex !== undefined) {
-            // Update the existing sale
-            pastSales[editIndex] = {
-                productName,
-                quantity,
-                price,
-                date: pastSales[editIndex].date, // Keep the original date
-                time: pastSales[editIndex].time, // Keep the original time
-            };
-            delete salesForm.dataset.editIndex; // Clear the edit index
-        } else {
-            // Add a new sale
-            const now = new Date();
-            pastSales.push({
-                productName,
-                quantity,
-                price,
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString(),
-            });
+        // Send the sale data to the backend
+        fetch('/add-sale', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productName: productData.name,
+                quantity: quantityInput,
+                price: productData.price,
+                paymentMethod,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else {
+                    alert('Sale recorded successfully!');
+                    // Reload the sales table and product dropdown
+                    loadSalesData();
+                    loadProducts();
+                }
+            })
+            .catch(error => console.error('Error saving sale:', error));
 
-            // Update the inventory quantity
-            const product = stockData.find((item) => item.productName === productName);
-            if (product) {
-                product.productQuantity -= quantity; // Reduce the quantity in inventory
-                localStorage.setItem('products', JSON.stringify(stockData)); // Update inventory in localStorage
-            }
-        }
-
-        // Update localStorage
-        localStorage.setItem('sales', JSON.stringify(pastSales));
-
-        // Refresh the table and reset the form
-        populatePastSalesTable();
-        populateProductDropdown(); // Refresh the dropdown to show updated stock
+        // Reset the form and hide it
         salesForm.reset();
         salesFormContainer.classList.add('hidden');
     });
 
-    // Initial population of past sales table
-    populatePastSalesTable();
+    // Function to fetch and display sales data
+    function loadSalesData() {
+        fetch('/get-sales')
+            .then(response => response.json())
+            .then(sales => {
+                // Clear the table body
+                pastSalesTableBody.innerHTML = '';
+
+                // Populate the table with sales data
+                sales.forEach(sale => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+    <td>${sale.productName}</td>
+    <td>${sale.quantitySold}</td>
+    <td>${sale.pricePerUnit.toFixed(2)}</td>
+    <td>${sale.totalPrice.toFixed(2)}</td>
+    <td>${sale.paymentMethod}</td>
+    <td>${sale.saleDate}</td>
+    <td>
+        <button class="delete-sale-btn" data-id="${sale.id}">Delete</button>
+        <button class="edit-sale-btn" data-id="${sale.id}" data-quantity="${sale.quantitySold}" data-payment="${sale.paymentMethod}">Edit</button>
+    </td>
+`;
+
+                    pastSalesTableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching sales data:', error));
+    }
+
+    // Show the modal when the "Edit" button is clicked
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-sale-btn')) {
+            const saleId = e.target.dataset.id;
+            console.log('Sale ID:', saleId); // Debugging line
+            const quantity = e.target.dataset.quantity;
+            const paymentMethod = e.target.dataset.payment;
+
+            // Populate the modal fields
+            document.getElementById('editSaleId').value = saleId;
+            document.getElementById('editQuantity').value = quantity;
+            document.getElementById('editPaymentMethod').value = paymentMethod;
+
+            // Show the modal
+            editSaleModal.classList.remove('hidden');
+        }
+    });
+
+    // Close the modal when the "Close" button is clicked
+    closeEditSaleModal.addEventListener('click', () => {
+        editSaleModal.classList.add('hidden');
+    });
+
+    // Close the modal when the "Cancel" button is clicked
+    cancelEditSale.addEventListener('click', () => {
+        editSaleModal.classList.add('hidden');
+    });
+
+    // Close the modal when clicking outside the modal content
+    window.addEventListener('click', (e) => {
+        if (e.target === editSaleModal) {
+            editSaleModal.classList.add('hidden');
+        }
+    });
+
+    // Handle edit form submission
+    editSaleForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const saleId = editSaleId.value;
+        const quantity = editQuantity.value;
+        const paymentMethod = editPaymentMethod.value;
+
+        fetch('/update-sale', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                saleId,
+                quantity,
+                paymentMethod,
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                } else {
+                    alert('Sale updated successfully!');
+                    // Reload the sales table and product dropdown
+                    loadSalesData();
+                    loadProducts();
+                }
+            })
+            .catch(error => console.error('Error updating sale:', error));
+
+        // Hide the modal
+        editSaleModal.classList.add('hidden');
+    });
+
+    // Load sales data and products when the page loads
+    loadSalesData();
+    loadProducts();
 });

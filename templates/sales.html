@@ -31,9 +31,6 @@
         <!-- Sales Form (Initially Hidden) -->
         <div id="salesFormContainer" class="sales-form hidden">
             <form id="salesForm">
-                <label for="customerName">Customer Name:</label>
-                <input type="text" id="customerName" name="customerName" required>
-
                 <label for="productSelect">Product:</label>
                 <select id="productSelect" name="productSelect" required>
                     <option value="">Select a product</option>
@@ -65,8 +62,7 @@
             <table id="pastSalesTable">
                 <thead>
                     <tr>
-                        <th>Customer</th>
-                        <th>Product</th>
+                        <th>Product Name</th>
                         <th>Quantity</th>
                         <th>Price</th>
                         <th>Total</th>
@@ -80,6 +76,27 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Edit Sale Modal -->
+        <div id="editSaleModal" class="edit-sale-modal hidden">
+            <div class="edit-sale-modal-content">
+                <span class="close" id="closeEditSaleModal">&times;</span>
+                <h3>Edit Sale</h3>
+                <form id="editSaleForm">
+                    <input type="hidden" id="editSaleId">
+                    <label for="editQuantity">Quantity:</label>
+                    <input type="number" id="editQuantity" min="1" required>
+                    <label for="editPaymentMethod">Payment Method:</label>
+                    <select id="editPaymentMethod" required>
+                        <option value="cash">Cash</option>
+                        <option value="credit">Credit</option>
+                        <option value="mobile">Mobile Payment</option>
+                    </select>
+                    <button type="submit">Save Changes</button>
+                    <button type="button" id="cancelEditSale">Cancel</button>
+                </form>
+            </div>
+        </div>
     </main>
 
     <footer>
@@ -87,45 +104,5 @@
     </footer>
 
     <script src="{{ url_for('static', filename='scripts/sales.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const addSaleBtn = document.getElementById('addSaleBtn');
-            const salesFormContainer = document.getElementById('salesFormContainer');
-            const cancelSaleBtn = document.getElementById('cancelSaleBtn');
-            const salesForm = document.getElementById('salesForm');
-
-            // Show the sales form
-            addSaleBtn.addEventListener('click', () => {
-                salesFormContainer.classList.remove('hidden');
-            });
-
-            // Hide the sales form
-            cancelSaleBtn.addEventListener('click', () => {
-                salesFormContainer.classList.add('hidden');
-            });
-
-            // Handle form submission
-            salesForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                const customerName = document.getElementById('customerName').value;
-                const productSelect = document.getElementById('productSelect').value;
-                const quantityInput = document.getElementById('quantityInput').value;
-                const paymentMethod = document.getElementById('paymentMethod').value;
-
-                // Example: Save the sale to the database (replace with actual backend logic)
-                console.log({
-                    customerName,
-                    productSelect,
-                    quantityInput,
-                    paymentMethod,
-                });
-
-                // Reset the form and hide it
-                salesForm.reset();
-                salesFormContainer.classList.add('hidden');
-            });
-        });
-    </script>
 </body>
 </html>
