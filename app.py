@@ -4,8 +4,10 @@ import MySQLdb
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Database configuration
 app.config['MYSQL_HOST'] = 'localhost'
@@ -85,6 +87,16 @@ CREATE TABLE IF NOT EXISTS history (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 """)
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS expenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
 db.commit()
 cursor.close()
 
@@ -577,6 +589,106 @@ def delete_sale(sale_id):
     except Exception as e:
         print(f"Error deleting sale: {e}")
         return jsonify({'error': 'An error occurred while deleting the sale.'}), 500
+
+
+
+# Flask route to fetch sales data
+@app.route('/get-metrics', methods=['GET'])
+def get_metrics():
+    try:
+        cursor = db.cursor()
+
+        # Calculate total sales
+        cursor.execute("SELECT SUM(total_price) FROM sales")
+        total_sales = cursor.fetchone()[0] or 0
+
+        # Calculate total cost of goods sold (COGS)
+        cursor.execute("""
+            SELECT SUM(s.quantity_sold * p.product_purchase)
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+        """)
+        total_cogs = cursor.fetchone()[0] or 0
+
+        # Calculate total expenses
+        cursor.execute("SELECT SUM(amount) FROM expenses")
+        total_expenses = cursor.fetchone()[0] or 0
+
+        # Calculate profit
+        profit = total_sales - total_cogs - total_expenses
+
+        cursor.close()
+
+        # Format numbers with commas
+        return jsonify({
+            'total_sales': f"{total_sales:,.2f}",
+            'profit': f"{profit:,.2f}",
+            'expenses': f"{total_expenses:,.2f}",
+            'revenue': f"{total_sales:,.2f}"  # Assuming revenue is the same as total sales
+        })
+    except Exception as e:
+        print(f"Error fetching metrics: {e}")
+        return jsonify({'error': 'An error occurred while fetching metrics.'}), 500
+
+@app.route('/add-expense', methods=['POST'])
+def add_expense():
+    try:
+        # Parse JSON data from the request
+        data = request.get_json()
+        description = data['description']
+        amount = float(data['amount'])
+
+        # Insert the expense into the database (date will be auto-generated)
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO expenses (description, amount) VALUES (%s, %s)",
+            (description, amount)
+        )
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Expense added successfully!'}), 201
+    except Exception as e:
+        print(f"Error adding expense: {e}")
+        return jsonify({'error': 'An error occurred while adding the expense.'}), 500
+
+@app.route('/get-expenses', methods=['GET'])
+def get_expenses():
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT id, description, amount, date FROM expenses ORDER BY date DESC")
+        expenses = cursor.fetchall()
+        cursor.close()
+
+        # Convert the data into a list of dictionaries
+        expense_list = [
+            {
+                "id": row[0],
+                "description": row[1],
+                "amount": float(row[2]),
+                "date": row[3].strftime('%Y-%m-%d %H:%M:%S') if row[3] else ''
+            }
+            for row in expenses
+        ]
+
+        return jsonify(expense_list)
+    except Exception as e:
+        print(f"Error fetching expenses: {e}")
+        return jsonify({'error': 'An error occurred while fetching expenses.'}), 500
+
+# Route to handle deleting an expense
+@app.route('/delete-expense/<int:expense_id>', methods=['DELETE'])
+def delete_expense(expense_id):
+    try:
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM expenses WHERE id = %s", (expense_id,))
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Expense deleted successfully!'}), 200
+    except Exception as e:
+        print(f"Error deleting expense: {e}")
+        return jsonify({'error': 'An error occurred while deleting the expense.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

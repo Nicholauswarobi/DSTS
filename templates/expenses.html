@@ -33,9 +33,6 @@
             <label for="expenseAmount">Amount (TSH):</label>
             <input type="number" id="expenseAmount" required>
             
-            <label for="expenseDate">Date:</label>
-            <input type="date" id="expenseDate" required>
-            
             <button type="submit">Add Expense</button>
         </form>
     </section>
@@ -63,69 +60,6 @@
 </footer>
 </main>
 
-
-
-<script>
-    // Handle adding expenses
-    const expenseForm = document.getElementById('expenseForm');
-    const expenseTableBody = document.getElementById('expenseTableBody');
-
-    expenseForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Get form values
-        const expenseName = document.getElementById('expenseName').value;
-        const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
-        const expenseDate = document.getElementById('expenseDate').value;
-
-        // Save expense to localStorage
-        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        expenses.push({ expenseName, expenseAmount, expenseDate });
-        localStorage.setItem('expenses', JSON.stringify(expenses));
-
-        // Update the table
-        populateExpenseTable();
-
-        // Reset the form
-        expenseForm.reset();
-    });
-
-    // Populate the expense table
-    const populateExpenseTable = () => {
-        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        expenseTableBody.innerHTML = '';
-
-        expenses.forEach((expense, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${expense.expenseName}</td>
-                <td>${expense.expenseAmount.toFixed(2)}</td>
-                <td>${expense.expenseDate}</td>
-                <td><button class="delete-button" data-index="${index}">Delete</button></td>
-            `;
-            expenseTableBody.appendChild(row);
-        });
-
-        // Add event listeners to delete buttons
-        const deleteButtons = document.querySelectorAll('.delete-button');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const index = e.target.getAttribute('data-index');
-                deleteExpense(index);
-            });
-        });
-    };
-
-    // Delete an expense
-    const deleteExpense = (index) => {
-        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        expenses.splice(index, 1); // Remove the expense at the given index
-        localStorage.setItem('expenses', JSON.stringify(expenses));
-        populateExpenseTable(); // Refresh the table
-    };
-
-    // Initial population of the table
-    populateExpenseTable();
-</script>
+<script src="{{ url_for('static', filename='scripts/expenses.js') }}"></script>
 </body>
 </html>
