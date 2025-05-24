@@ -90,6 +90,7 @@ cursor.close()
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 # Route for registering a user
 @app.route('/register', methods=['POST'])
 def handle_register():
@@ -126,6 +127,9 @@ def index():
 def register():
     return render_template('Register.html')
 
+
+
+
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
@@ -148,10 +152,9 @@ def login():
         # Invalid credentials
         return "Invalid username or password", 401
 
-# Route for the dashboard (after successful login)
-# @app.route('/dashboard')
-# def dashboard():
-#     return "Welcome to the Dashboard!"
+
+
+
 
 # Route to handle adding a product
 @app.route('/add-product', methods=['POST'])
@@ -175,6 +178,9 @@ def add_product():
     cursor.close()
 
     return jsonify({'message': 'Product added successfully!'})
+
+
+
 
 # Route for the inventory page
 @app.route('/inventory')
@@ -201,15 +207,21 @@ def inventory():
     # Pass the product list to the template
     return render_template('inventory.html', products=product_list)
 
+
+
 # Route for the sales page
 @app.route('/sales')
 def sales():
     return render_template('sales.html')
 
+
+
 # Route for the expenses page
 @app.route('/expenses')
 def expenses():
     return render_template('expenses.html')
+
+
 
 @app.route('/dsts')
 def dsts():
@@ -229,29 +241,37 @@ def financial():
 
 
 
+
 # Route to handle editing a product
 @app.route('/edit-product/<int:product_id>', methods=['POST'])
 def edit_product(product_id):
-    data = request.json
-    product_name = data['productName']
-    product_quantity = data['productQuantity']
-    product_price = data['productPrice']
-    product_purchase = data['productPurchase']
-    manufactured_date = data['manufacturedDate']
-    expired_date = data['expiredDate']
+    try:
+        # Parse JSON data from the request
+        data = request.get_json()
+        product_name = data['productName']
+        product_quantity = data['productQuantity']
+        product_price = data['productPrice']
+        product_purchase = data['productPurchase']
+        manufactured_date = data['manufacturedDate']
+        expired_date = data['expiredDate']
 
-    # Update the product in the database
-    cursor = db.cursor()
-    cursor.execute("""
-        UPDATE products
-        SET product_name = %s, product_quantity = %s, product_price = %s, product_purchase = %s,
-            manufactured_date = %s, expired_date = %s
-        WHERE id = %s
-    """, (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, product_id))
-    db.commit()
-    cursor.close()
+        # Update the product in the database
+        cursor = db.cursor()
+        cursor.execute("""
+            UPDATE products
+            SET product_name = %s, product_quantity = %s, product_price = %s, 
+                product_purchase = %s, manufactured_date = %s, expired_date = %s
+            WHERE id = %s
+        """, (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, product_id))
+        db.commit()
+        cursor.close()
 
-    return jsonify({'message': 'Product updated successfully!'})
+        return jsonify({'message': 'Product updated successfully!'})
+    except Exception as e:
+        print(f"Error updating product: {e}")  # Debugging log
+        return jsonify({'error': 'An error occurred while updating the product. Please try again.'}), 500
+
+
 
 # Route to handle deleting a product
 @app.route('/delete-product/<int:product_id>', methods=['DELETE'])
@@ -291,6 +311,8 @@ def get_inventory_data():
 
     return jsonify(product_list)
 
+
+
 # Route to get product details for editing
 @app.route('/edit-product/<int:product_id>', methods=['GET'])
 def get_product_details(product_id):
@@ -309,9 +331,12 @@ def get_product_details(product_id):
             "manufacturedDate": product[5].strftime('%Y-%m-%d') if product[5] else '',
             "expiredDate": product[6].strftime('%Y-%m-%d') if product[6] else '',
         }
+        print("Fetched Product Data:", product_data)  # Debugging log
         return jsonify(product_data)
     else:
+        print("Product not found for ID:", product_id)  # Debugging log
         return jsonify({"error": "Product not found"}), 404
+
 
 # Secret key for session management
 app.secret_key = os.urandom(24)  # Generates a random 24-byte key

@@ -16,6 +16,8 @@ editProductBtn.addEventListener('click', async () => {
         const row = selectedRows[0].closest('tr');
         const productId = row.dataset.productId;
 
+        console.log('Selected Product ID:', productId); // Debugging log
+
         if (!productId) {
             alert('Product ID is missing. Please try again.');
             return;
@@ -25,10 +27,11 @@ editProductBtn.addEventListener('click', async () => {
             // Fetch product details from the server
             const response = await fetch(`/edit-product/${productId}`, { method: 'GET' });
             if (!response.ok) {
-                throw new Error('Failed to fetch product details.');
+                throw new Error(`Failed to fetch product details. Status: ${response.status}`);
             }
 
             const product = await response.json();
+            console.log('Fetched Product Details:', product); // Debugging log
 
             // Populate the modal with product details
             document.getElementById('editProductId').value = product.id;
@@ -40,9 +43,11 @@ editProductBtn.addEventListener('click', async () => {
             document.getElementById('editExpiredDate').value = product.expiredDate;
 
             // Show the modal
-            document.getElementById('editProductModal').classList.remove('hidden');
+            const modal = document.getElementById('editProductModalContainer');
+            modal.style.display = 'block'; // Show the modal
+            console.log('Modal should now be visible'); // Debugging log
         } catch (error) {
-            console.error(error);
+            console.error('Error fetching product details:', error); // Log the error
             alert('Failed to load product details. Please try again.');
         }
     } else {
@@ -51,8 +56,13 @@ editProductBtn.addEventListener('click', async () => {
 });
 
 // Close the Edit Product Modal
-document.getElementById('closeEditModal').addEventListener('click', () => {
-    document.getElementById('editProductModal').classList.add('hidden');
+document.getElementById('closeEditProductModal').addEventListener('click', () => {
+    document.getElementById('editProductModalContainer').style.display = 'none'; // Hide the modal
+});
+
+// Cancel Button Functionality
+document.getElementById('cancelEditProduct').addEventListener('click', () => {
+    document.getElementById('editProductModalContainer').style.display = 'none'; // Hide the modal
 });
 
 // Delete Product
@@ -123,22 +133,87 @@ const populateInventoryTable = async () => {
 populateInventoryTable();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Add Product Modal Elements
+    const addProductBtn = document.getElementById('addProductBtn');
     const addProductModal = document.getElementById('addProductModal');
     const cancelAddProduct = document.getElementById('cancelAddProduct');
-    const addProductForm = document.getElementById('addProductForm');
+
+    // Edit Product Modal Elements
+    const editProductBtn = document.getElementById('editProductBtn');
+    const editProductModal = document.getElementById('editProductModalContainer');
+    const cancelEditProduct = document.getElementById('cancelEditProduct');
+    const closeEditProductModal = document.getElementById('closeEditProductModal');
 
     // Show the Add Product Modal
     addProductBtn.addEventListener('click', () => {
-        addProductModal.style.display = 'block';
+        console.log('Add Product button clicked'); // Debugging log
+        addProductModal.style.display = 'block'; // Show the Add Product modal
     });
 
     // Hide the Add Product Modal
     cancelAddProduct.addEventListener('click', () => {
-        addProductModal.style.display = 'none';
+        console.log('Cancel Add Product button clicked'); // Debugging log
+        addProductModal.style.display = 'none'; // Hide the Add Product modal
+    });
+
+    // Show the Edit Product Modal
+    editProductBtn.addEventListener('click', async () => {
+        const selectedRows = document.querySelectorAll('.selectRow:checked');
+        if (selectedRows.length === 1) {
+            const row = selectedRows[0].closest('tr');
+            const productId = row.dataset.productId;
+
+            console.log('Selected Product ID:', productId); // Debugging log
+
+            if (!productId) {
+                alert('Product ID is missing. Please try again.');
+                return;
+            }
+
+            try {
+                // Fetch product details from the server
+                const response = await fetch(`/edit-product/${productId}`, { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product details. Status: ${response.status}`);
+                }
+
+                const product = await response.json();
+                console.log('Fetched Product Details:', product); // Debugging log
+
+                // Populate the modal with product details
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('editProductName').value = product.productName;
+                document.getElementById('editProductQuantity').value = product.productQuantity;
+                document.getElementById('editProductPrice').value = product.productPrice;
+                document.getElementById('editProductPurchase').value = product.productPurchase;
+                document.getElementById('editManufacturedDate').value = product.manufacturedDate;
+                document.getElementById('editExpiredDate').value = product.expiredDate;
+
+                // Show the Edit Product modal
+                editProductModal.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching product details:', error); // Log the error
+                alert('Failed to load product details. Please try again.');
+            }
+        } else {
+            alert('Please select exactly one product to edit.');
+        }
+    });
+
+    // Hide the Edit Product Modal
+    cancelEditProduct.addEventListener('click', () => {
+        console.log('Cancel Edit Product button clicked'); // Debugging log
+        editProductModal.style.display = 'none'; // Hide the Edit Product modal
+    });
+
+    // Close the Edit Product Modal
+    closeEditProductModal.addEventListener('click', () => {
+        console.log('Close Edit Product button clicked'); // Debugging log
+        editProductModal.style.display = 'none'; // Hide the Edit Product modal
     });
 
     // Handle Add Product Form Submission
-    addProductForm.addEventListener('submit', async (e) => {
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
         e.preventDefault(); // Prevent the default form submission
 
         const productName = document.getElementById('productName').value;
@@ -180,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle Edit Product Form Submission
     document.getElementById('editProductForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent the default form submission
 
         const productId = document.getElementById('editProductId').value;
         const productName = document.getElementById('editProductName').value;
@@ -206,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 alert('Product updated successfully!');
-                document.getElementById('editProductModal').classList.add('hidden');
+                document.getElementById('editProductModalContainer').style.display = 'none'; // Hide the modal
                 populateInventoryTable(); // Refresh the table
             } else {
                 alert('Failed to update product. Please try again.');

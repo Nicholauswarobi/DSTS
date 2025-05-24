@@ -60,7 +60,7 @@
                     </thead>
                     <tbody>
                         {% for product in products %}
-                        <tr>
+                        <tr data-product-id="{{ product.id }}">
                             <td><input type="checkbox" class="selectRow"></td>
                             <td>{{ product.productName }}</td>
                             <td>{{ product.productQuantity }}</td>
@@ -106,10 +106,10 @@
         </div>
 
         <!-- Edit Product Modal -->
-        <div id="editProductModal" class="modal hidden">
-            <div class="modal-content">
-                <span id="closeEditModal" class="close">&times;</span>
-                <h2>Edit Product</h2>
+        <div id="editProductModalContainer" class="edit-modal hidden">
+            <div class="edit-modal-content">
+                <span id="closeEditProductModal" class="edit-close">&times;</span>
+                <h3>Edit Product</h3>
                 <form id="editProductForm">
                     <input type="hidden" id="editProductId">
                     <label for="editProductName">Product Name:</label>
@@ -125,6 +125,7 @@
                     <label for="editExpiredDate">Expired Date:</label>
                     <input type="date" id="editExpiredDate" required>
                     <button type="submit">Save Changes</button>
+                    <button type="button" id="cancelEditProduct">Cancel</button>
                 </form>
             </div>
         </div>
