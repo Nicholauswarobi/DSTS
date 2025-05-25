@@ -907,7 +907,7 @@ h3 {
 }
 
 .notification.error {
-    background-color: #f44336; /* Red for errors */
+    background-color: #f44336;  
 }
 
 .notification.show {
@@ -927,12 +927,12 @@ h3 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
-    display: flex; /* Use flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    background: rgba(0, 0, 0, 0.6);     
+    display: flex;  
+    justify-content: center;    
+    align-items: center;    
     z-index: 1050; /* Ensure it appears above other elements */
-    animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+    animation: fadeIn 0.3s ease-in-out;     
 }
 
 /* Modal Content */
@@ -948,7 +948,7 @@ h3 {
     position: relative; /* For positioning the close button */
 }
 .hidden {
-    display: none; /* Hide the modal by default */
+    display: none;  
 }
 /* Modal Header */
 .edit-sale-modal-content h3 {
@@ -985,13 +985,13 @@ h3 {
 .edit-sale-modal-content input:focus,
 .edit-sale-modal-content select:focus {
     outline: none;
-    border-color: #007bff; /* Highlight border on focus */
+    border-color: #007bff;  
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 /* Modal Buttons */
 .edit-sale-modal-content button {
-    background-color: #007bff; /* Blue background */
+    background-color: #007bff;  
     color: #fff;
     border: none;
     cursor: pointer;
@@ -1001,16 +1001,16 @@ h3 {
 
 /* Hover Effect for Buttons */
 .edit-sale-modal-content button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #0056b3;  
 }
 
 /* Cancel Button */
 .edit-sale-modal-content button[type="button"] {
-    background-color: #6c757d; /* Gray for cancel button */
+    background-color: #6c757d;  
 }
 
 .edit-sale-modal-content button[type="button"]:hover {
-    background-color: #5a6268; /* Darker gray on hover */
+    background-color: #5a6268;  
 }
 
 /* Close Button */
@@ -1026,21 +1026,21 @@ h3 {
 }
 
 .edit-sale-modal .close:hover {
-    color: red; /* Red color on hover */
+    color: red;     
 }
 
 /* Sales Form Modal */
 .sales-form-modal {
-    display: none; /* Hidden by default */
+    display: none;  
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    z-index: 10000; /* Ensure it appears above other elements */
+    background: rgba(0, 0, 0, 0.6); 
+    justify-content: center;    
+    align-items: center;    
+    z-index: 10000; 
 }
 
 .sales-form-modal.hidden {
@@ -1052,14 +1052,14 @@ h3 {
 }
 
 .sales-form-modal-content {
-    background: #ffffff; /* White background for the modal */
-    padding: 30px; /* Add padding for spacing */
-    border-radius: 10px; /* Rounded corners */
-    width: 450px; /* Fixed width */
-    max-width: 90%; /* Ensure it fits smaller screens */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    background: #ffffff;      
+    padding: 30px;  
+    border-radius: 10px;    
+    width: 450px;       
+    max-width: 90%;     
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
     position: relative;
-    z-index: 10001; /* Ensure the modal content is above the modal background */
+    z-index: 10001;     
 }
 
 /* Modal Header */
@@ -1088,13 +1088,13 @@ h3 {
 .sales-form-modal-content input:focus,
 .sales-form-modal-content select:focus {
     outline: none;
-    border-color: #007bff; /* Highlight border on focus */
+    border-color: #007bff;  
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 /* Modal Buttons */
 .sales-form-modal-content button {
-    background-color: #007bff; /* Blue background */
+    background-color: #007bff;  
     color: #fff;
     border: none;
     cursor: pointer;
@@ -1104,16 +1104,16 @@ h3 {
 
 /* Hover Effect for Buttons */
 .sales-form-modal-content button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #0056b3;      
 }
 
 /* Cancel Button */
 .sales-form-modal-content button[type="button"] {
-    background-color: #6c757d; /* Gray for cancel button */
+    background-color: #6c757d;  
 }
 
 .sales-form-modal-content button[type="button"]:hover {
-    background-color: #5a6268; /* Darker gray on hover */
+    background-color: #5a6268;     
 }
 
 /* Sales Notification */
@@ -1122,8 +1122,8 @@ h3 {
     top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #4caf50; /* Green background for success */
-    color: #fff; /* White text */
+    background-color: #4caf50;      
+    color: #fff;    
     padding: 20px 40px;
     border-radius: 8px;
     font-size: 18px;
@@ -1143,7 +1143,7 @@ h3 {
 }
 
 .sales-notification.error {
-    background-color: #f44336; /* Red background for errors */
+    background-color: #f44336;  
 }
 
 /* Delete Sale Modal */
@@ -1215,7 +1215,7 @@ h3 {
     top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #4caf50; /* Green for success */
+    background-color: #4caf50;    
     color: #fff;
     padding: 15px 30px;
     border-radius: 8px;
@@ -1227,7 +1227,7 @@ h3 {
 }
 
 .inventory-notification.error {
-    background-color: #f44336; /* Red for errors */
+    background-color: #f44336;  
 }
 
 .inventory-notification.show {
