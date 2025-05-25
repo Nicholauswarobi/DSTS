@@ -32,11 +32,11 @@ nav {
     color: #fff;
     padding: 0.5rem 0;
     text-align: center;
-    position: fixed; /* Fixed position */
-    top: 100px; /* Adjust this value based on the header height */
+    position: fixed; 
+    top: 100px; 
     left: 0;
     width: 100%;
-    z-index: 1000; /* Just below the header */
+    z-index: 1000; 
 }
 
 nav ul {
@@ -549,7 +549,7 @@ button#addProductBtn:hover {
     margin: 10% auto;
     padding: 20px;
     border-radius: 12px;
-    width: 40%; /* Adjust width as needed */
+    width: 40%; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
     animation: slideIn 0.3s ease-in-out; /* Smooth slide-in animation */
     max-height: 70vh; /* Limit the height to 70% of the viewport */

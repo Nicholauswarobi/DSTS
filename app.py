@@ -605,36 +605,35 @@ def delete_sale(sale_id):
 @app.route('/get-metrics', methods=['GET'])
 def get_metrics():
     try:
-        cursor = db.cursor()
+        with db.cursor() as cursor:
+            # Calculate total sales
+            cursor.execute("SELECT SUM(total_price) FROM sales")
+            total_sales = cursor.fetchone()[0] or 0
 
-        # Calculate total sales
-        cursor.execute("SELECT SUM(total_price) FROM sales")
-        total_sales = cursor.fetchone()[0] or 0
+            # Calculate total cost of goods sold (COGS)
+            cursor.execute("""
+                SELECT SUM(s.quantity_sold * p.product_purchase)
+                FROM sales s
+                JOIN products p ON s.product_id = p.id
+            """)
+            total_cogs = cursor.fetchone()[0] or 0
 
-        # Calculate total cost of goods sold (COGS)
-        cursor.execute("""
-            SELECT SUM(s.quantity_sold * p.product_purchase)
-            FROM sales s
-            JOIN products p ON s.product_id = p.id
-        """)
-        total_cogs = cursor.fetchone()[0] or 0
+            # Calculate total expenses
+            cursor.execute("SELECT SUM(amount) FROM expenses")
+            total_expenses = cursor.fetchone()[0] or 0
 
-        # Calculate total expenses
-        cursor.execute("SELECT SUM(amount) FROM expenses")
-        total_expenses = cursor.fetchone()[0] or 0
+            # Calculate profit
+            profit = total_sales - total_cogs - total_expenses
 
-        # Calculate profit
-        profit = total_sales - total_cogs - total_expenses
-
-        cursor.close()
-
-        # Format numbers with commas
-        return jsonify({
+        # Format the data for the frontend
+        result = {
             'total_sales': f"{total_sales:,.2f}",
             'profit': f"{profit:,.2f}",
             'expenses': f"{total_expenses:,.2f}",
             'revenue': f"{total_sales:,.2f}"  # Assuming revenue is the same as total sales
-        })
+        }
+
+        return jsonify(result), 200
     except Exception as e:
         print(f"Error fetching metrics: {e}")
         return jsonify({'error': 'An error occurred while fetching metrics.'}), 500
@@ -771,6 +770,44 @@ def get_debtors():
     except Exception as e:
         print(f"Error fetching debtors: {e}")
         return jsonify({'error': 'An error occurred while fetching debtors.'}), 500
+
+@app.route('/get-top-products', methods=['GET'])
+def get_top_products():
+    try:
+ 
+        with db.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.product_name, 
+                    SUM(s.quantity_sold) AS total_units_sold, 
+                    SUM(s.total_price) AS total_revenue
+                FROM 
+                    sales s
+                JOIN 
+                    products p ON s.product_id = p.id
+                GROUP BY 
+                    p.product_name
+                ORDER BY 
+                    total_units_sold DESC
+                LIMIT 5
+            """)
+            top_products = cursor.fetchall()
+         
+
+        result = [
+            {
+                "rank": idx + 1,
+                "product_name": row[0],
+                "units_sold": row[1],
+                "revenue": row[2]
+            }
+            for idx, row in enumerate(top_products)
+        ]
+  
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error fetching top products: {e}")
+        return jsonify({"error": "Failed to fetch top products"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
