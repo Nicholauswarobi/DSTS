@@ -3,63 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Expenses</title>
+<title>Expenses and Debtors</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/expenses.css') }}">
 <link rel="icon" href="{{ url_for('static', filename='images/dstsICON.png') }}" type="image/x-icon">
 </head>
 <body>
 <header>
-    <h1>Daily Expenses</h1>
-    <p>Track and manage your daily business expenses efficiently.</p>
+    <h1>Expenses and Debtors</h1>
+    <p>Track and manage your daily business expenses and debtors efficiently.</p>
 </header>
 
- <nav>
-        <ul>
-            <li><a href="{{ url_for('dsts') }}">Dashboard</a></li>
-            <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
-            <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
-            <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
-        </ul>
-    </nav>
-
+<nav>
+    <ul>
+        <li><a href="{{ url_for('dsts') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
+        <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
+        <li><a href="{{ url_for('financial') }}">Financial Tracking</a></li>
+    </ul>
+</nav>
 
 <main>
-    <section class="expense-form">
-        <h2>Add Expense</h2>
-        <form id="expenseForm">
-            <label for="expenseName">Expense Name:</label>
-            <input type="text" id="expenseName" required>
-            
-            <label for="expenseAmount">Amount (TSH):</label>
-            <input type="number" id="expenseAmount" required>
-            
-            <button type="submit">Add Expense</button>
-        </form>
+    <!-- Buttons to open modals -->
+    <section class="action-buttons">
+        <button id="openExpenseModal">Add Expense</button>
+        <button id="openDebtorModal">Add Debtor</button>
     </section>
 
-    <section class="expense-table">
-        <h2>Expense Records</h2>
+    <!-- Tables for displaying data -->
+    <section class="data-tables">
         <div class="table-container">
-            <table>
-            <thead>
-                <tr>
-                    <th>Expense Name</th>
-                    <th>Amount (TSH)</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="expenseTableBody">
-                <!-- Expenses will be dynamically added here -->
-            </tbody>
-        </table>
+            <h2>Expense Records</h2>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Expense Name</th>
+                        <th>Amount (TSH)</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="expenseTableBody">
+                    <!-- Expenses will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h2>Debtor Records</h2>
+            <table class="debtor-table">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Amount Owed (TSH)</th>
+                        <th>Date Added</th>
+                        <th>Last Payment</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="debtorTableBody">
+                    <!-- Debtors will be dynamically added here -->
+                </tbody>
+            </table>
         </div>
     </section>
-    <footer>
-    <p>&copy; 2025 DSTS. All rights reserved.</p>
-</footer>
+
+    <!-- Modal for adding expenses -->
+    <div id="expenseModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeExpenseModal">&times;</span>
+            <h2>Add Expense</h2>
+            <form id="expenseForm">
+                <label for="expenseName">Expense Name:</label>
+                <input type="text" id="expenseName" required>
+                
+                <label for="expenseAmount">Amount (TSH):</label>
+                <input type="number" id="expenseAmount" required>
+                
+                <button type="submit">Add Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for adding debtors -->
+    <div id="debtorModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closeDebtorModal">&times;</span>
+            <h2>Add Debtor</h2>
+            <form id="debtorForm">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" required>
+                
+                <label for="amountOwed">Amount Owed (TSH):</label>
+                <input type="number" id="amountOwed" required>
+                
+                <button type="submit">Add Debtor</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" id="closePaymentModal">&times;</span>
+            <h2>Record Payment</h2>
+            <form id="paymentForm">
+                <label for="paymentAmount">Payment Amount (TSH):</label>
+                <input type="number" id="paymentAmount" required>
+                <input type="hidden" id="debtorId"> <!-- Hidden field to store debtor ID -->
+                <button type="submit">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Popup -->
+    <div id="confirmationPopup" class="popup hidden">
+        <div class="popup-content">
+            <p>Are you sure you want to delete this expense?</p>
+            <button id="confirmDelete">Yes</button>
+            <button id="cancelDelete">No</button>
+        </div>
+    </div>
+
+    <!-- Notification Popup -->
+    <div id="notificationPopup" class="popup hidden">
+        <div class="popup-contentp">
+            <p id="notificationMessage"></p>
+        </div>
+    </div>
 </main>
 
+<footer>
+    <p>&copy; 2025 DSTS. All rights reserved.</p>
+</footer>
+
 <script src="{{ url_for('static', filename='scripts/expenses.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/debtors.js') }}"></script>
 </body>
 </html>

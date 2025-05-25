@@ -97,6 +97,15 @@ CREATE TABLE IF NOT EXISTS expenses (
 )
 """)
 
+cursor.execute("""CREATE TABLE IF NOT EXISTS debtors (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    amount_owed DECIMAL(10, 2) NOT NULL,
+    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_payment_date TIMESTAMP NULL DEFAULT NULL,
+    status VARCHAR(10) DEFAULT 'Pending'
+)""")
+
 db.commit()
 cursor.close()
 
@@ -684,11 +693,84 @@ def delete_expense(expense_id):
         cursor.execute("DELETE FROM expenses WHERE id = %s", (expense_id,))
         db.commit()
         cursor.close()
-
         return jsonify({'message': 'Expense deleted successfully!'}), 200
     except Exception as e:
         print(f"Error deleting expense: {e}")
         return jsonify({'error': 'An error occurred while deleting the expense.'}), 500
+
+
+
+@app.route('/add-debtor', methods=['POST'])
+def add_debtor():
+    try:
+        data = request.get_json()
+        customer_name = data['customer_name']
+        amount_owed = float(data['amount_owed'])
+        status = 'PENDING' if amount_owed > 0 else 'PAID'
+
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO debtors (customer_name, amount_owed, status) VALUES (%s, %s, %s)",
+            (customer_name, amount_owed, status)
+        )
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Debtor added successfully!'}), 201
+    except Exception as e:
+        print(f"Error adding debtor: {e}")
+        return jsonify({'error': 'An error occurred while adding the debtor.'}), 500
+
+@app.route('/record-payment/<int:debtor_id>', methods=['POST'])
+def record_payment(debtor_id):
+    try:
+        data = request.get_json()
+        payment_amount = float(data['payment_amount'])
+
+        cursor = db.cursor()
+        # Update the amount owed and set the last payment date
+        cursor.execute(
+            """
+            UPDATE debtors
+            SET amount_owed = GREATEST(amount_owed - %s, 0),
+                last_payment_date = CURRENT_TIMESTAMP,
+                status = CASE WHEN amount_owed - %s <= 0 THEN 'PAID' ELSE 'PENDING' END
+            WHERE id = %s
+            """,
+            (payment_amount, payment_amount, debtor_id)
+        )
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Payment recorded successfully!'}), 200
+    except Exception as e:
+        print(f"Error recording payment: {e}")
+        return jsonify({'error': 'An error occurred while recording the payment.'}), 500
+
+@app.route('/get-debtors', methods=['GET'])
+def get_debtors():
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT id, customer_name, amount_owed, date_added, last_payment_date, status FROM debtors")
+        debtors = cursor.fetchall()
+        cursor.close()
+
+        debtor_list = [
+            {
+                "id": row[0],
+                "customer_name": row[1],
+                "amount_owed": float(row[2]),
+                "date_added": row[3].strftime('%Y-%m-%d %H:%M:%S'),
+                "last_payment_date": row[4].strftime('%Y-%m-%d %H:%M:%S') if row[4] else None,
+                "status": row[5]
+            }
+            for row in debtors
+        ]
+
+        return jsonify(debtor_list)
+    except Exception as e:
+        print(f"Error fetching debtors: {e}")
+        return jsonify({'error': 'An error occurred while fetching debtors.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

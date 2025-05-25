@@ -1,16 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const expenseForm = document.getElementById('expenseForm');
-    const expenseTableBody = document.getElementById('expenseTableBody');
+    // Get modal elements
+    const expenseModal = document.getElementById('expenseModal');
+    const openExpenseModal = document.getElementById('openExpenseModal');
+    const closeExpenseModal = document.getElementById('closeExpenseModal');
+    const confirmationPopup = document.getElementById('confirmationPopup');
+    const confirmDeleteButton = document.getElementById('confirmDelete');
+    const cancelDeleteButton = document.getElementById('cancelDelete');
+    const notificationPopup = document.getElementById('notificationPopup');
+    const notificationMessage = document.getElementById('notificationMessage');
+    let expenseIdToDelete = null; // Store the ID of the expense to delete
+
+    // Open Expense Modal
+    openExpenseModal.addEventListener('click', () => {
+        expenseModal.classList.remove('hidden');
+    });
+
+    // Close Expense Modal
+    closeExpenseModal.addEventListener('click', () => {
+        expenseModal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside the modal content
+    window.addEventListener('click', (event) => {
+        if (event.target === expenseModal) {
+            expenseModal.classList.add('hidden');
+        }
+    });
 
     // Handle adding expenses
+    const expenseForm = document.getElementById('expenseForm');
     expenseForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Get form values
         const description = document.getElementById('expenseName').value;
         const amount = parseFloat(document.getElementById('expenseAmount').value);
 
-        // Send data to the backend
         fetch('/add-expense', {
             method: 'POST',
             headers: {
@@ -25,12 +49,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
-                console.log(data.message); // Debugging log
-                populateExpenseTable(); // Refresh the table
-                expenseForm.reset(); // Reset the form
+                console.log(data.message);
+                populateExpenseTable();
+                expenseForm.reset();
+                expenseModal.classList.add('hidden');
             })
             .catch(error => console.error('Error adding expense:', error));
     });
+
+    // Function to show the confirmation popup
+    const showConfirmationPopup = (expenseId) => {
+        expenseIdToDelete = expenseId; // Store the expense ID
+        confirmationPopup.classList.remove('hidden');
+    };
+
+    // Function to hide the confirmation popup
+    const hideConfirmationPopup = () => {
+        confirmationPopup.classList.add('hidden');
+        expenseIdToDelete = null; // Reset the expense ID
+    };
+
+    // Function to show the notification popup
+    const showNotification = (message) => {
+        notificationMessage.textContent = message;
+        notificationPopup.classList.remove('hidden');
+
+        // Automatically hide the notification after 3 seconds
+        setTimeout(() => {
+            notificationPopup.classList.add('hidden');
+        }, 3000);
+    };
+
+    // Handle delete button clicks
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete-button')) {
+            const expenseId = event.target.getAttribute('data-id');
+            showConfirmationPopup(expenseId); // Show confirmation popup
+        }
+    });
+
+    // Handle confirmation of delete
+    confirmDeleteButton.addEventListener('click', () => {
+        if (expenseIdToDelete) {
+            fetch(`/delete-expense/${expenseIdToDelete}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete expense');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data.message);
+                    populateExpenseTable(); // Refresh the table
+                    showNotification('Expense deleted successfully!'); // Show notification
+                })
+                .catch(error => {
+                    console.error('Error deleting expense:', error);
+                    showNotification('Failed to delete expense.');
+                })
+                .finally(() => {
+                    hideConfirmationPopup(); // Hide the confirmation popup
+                });
+        }
+    });
+
+    // Handle cancellation of delete
+    cancelDeleteButton.addEventListener('click', hideConfirmationPopup);
 
     // Populate the expense table
     const populateExpenseTable = () => {
@@ -42,7 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(expenses => {
-                expenseTableBody.innerHTML = ''; // Clear the table
+                const expenseTableBody = document.getElementById('expenseTableBody');
+                expenseTableBody.innerHTML = '';
 
                 expenses.forEach(expense => {
                     const row = document.createElement('tr');
@@ -54,35 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                     expenseTableBody.appendChild(row);
                 });
-
-                // Add event listeners to delete buttons
-                const deleteButtons = document.querySelectorAll('.delete-button');
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        deleteExpense(id);
-                    });
-                });
             })
             .catch(error => console.error('Error fetching expenses:', error));
-    };
-
-    // Delete an expense
-    const deleteExpense = (id) => {
-        fetch(`/delete-expense/${id}`, {
-            method: 'DELETE',
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to delete expense');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data.message); // Debugging log
-                populateExpenseTable(); // Refresh the table
-            })
-            .catch(error => console.error('Error deleting expense:', error));
     };
 
     // Call populateExpenseTable on page load

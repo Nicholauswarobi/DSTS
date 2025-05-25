@@ -1,37 +1,32 @@
-/* General Styles */
-*{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-}
+/* General Layout */
 body {
-    font-family: Arial, sans-serif;
-    height: 100vh;
     background-color: #ecf5ff;
-    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the body takes up the full viewport height */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
 }
 
 header {
-    background-color: #007bff;
-    color: white;
-    padding: 20px;
+    background: #007BFF;
+    color: #fff;
+    line-height: 0;
     text-align: center;
-    position: sticky; /* Make the header sticky */
-    top: 0; /* Stick to the top of the viewport */
+    position: fixed; /* Fixed position */
     height: 100px;
+    top: 0;
+    left: 0;
     width: 100%;
+    z-index: 9999; /* Stay on top */
     display: flex;
-    justify-content: center;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2rem;
-    
-    
-}
 nav {
     background: #434e64;
     color: #fff;
@@ -41,22 +36,19 @@ nav {
     top: 100px; /* Adjust this value based on the header height */
     left: 0;
     width: 100%;
-    height: 40px;
     z-index: 1000; /* Just below the header */
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
     gap: 1rem;
 }
 
 nav ul li {
-    
     display: inline;
 }
 
@@ -72,222 +64,341 @@ nav ul li a:hover {
     background: #007BFF;
 }
 
-/* Main Content */
 main {
-    height: calc(87vh - 80px); /* Adjust height to fit header and footer */
-    padding: 20px;
-    /* max-width: 100vw; */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
+    flex: 1; /* Allow the main content to grow and take up available space */
+    overflow-y: auto; /* Enable scrolling for the main content */
+    padding: 150px 20px 20px;
 }
 
-/* Expense Form Section */
-.expense-form {
-    background-color: #ffffff;
-    padding: 20px 40px;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.expense-form h2 {
-    margin-top: 0;
-    font-size: 1.5rem;
-    color: #007bff;
-    text-align: center;
-}
-
-.expense-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-.expense-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.expense-form button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.expense-form button:hover {
-    background-color: #0056b3;
-}
-
-/* Expense Table Section */
-.expense-table {
-    background-color: #ffffff;
-    border-radius: 8px;
-    width: 700px;
-    height: 500px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-;
-}
-
-.expense-table h2 {
-    margin-top: 0;
-    margin: 0;
-    background-color: #ffffff; /* Match the background color */
-    color:  #007bff;
-    text-align: center;
-    padding: 10px;
-    z-index: 1000; /* Ensure it stays above other elements */
-    border-bottom: 1px solid #ddd; /* Optional: Add a bottom border for separation */
-}
-.table-container{
-    width: 100%;
-    height: 100%;
-    /* margin: 0 0 20px 0 ;
-    padding: 0 0 20px 0 ; */
-    overflow-y: auto;
-    
-}
-
-.expense-table table {
-    width: 100%;
-    border-collapse: collapse;
-    /* margin-top: 15px; */
-}
-
-.expense-table th, .expense-table td {
-    text-align: left;
-    padding: 10px;
-    border: 1px solid #ddd;
-}
-
-.expense-table th {
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    position: sticky; /* Make the table header sticky */
-    top: 0; /* Stick to the top of the table container */
-    z-index: 999; /* Ensure it stays above table rows */
-}
-
-.expense-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+section {
+    margin-bottom: 2rem;
 }
 
 /* Footer */
 footer {
     text-align: center;
-    padding: 10px;
     background-color: #434e64;
     color: white;
+    padding: 10px;
+    border-top: 1px solid #dee2e6;
+    position: relative;
+    bottom: 0;
     width: 100%;
+}
+
+/* Buttons */
+button {
+    background-color: #2d76c3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Action Buttons Section */
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Center the buttons horizontally */
+    gap: 20px; /* Add spacing between buttons */
+    margin-bottom: 20px; /* Add space between buttons and tables */
+    flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
+    width: 100%; /* Ensure buttons span the full width */
+    margin-top: 80px;
+}
+
+/* Data Tables Section */
+.data-tables {
+    display: flex;
+    justify-content: space-between; /* Space tables evenly */
+    gap: 20px; /* Add spacing between tables */
+    flex-wrap: wrap; 
+    width: 100%; 
+    margin-top: 0; 
+    flex-direction: row; 
+}
+
+.table-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 48%;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-container h2 {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    margin: 0;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* important for alignment */
+}
+
+.table-container thead {
+    background-color: #007bff;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.table-container th,
+.table-container td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-container tbody {
+    display: block;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.table-container thead,
+.table-container tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-container tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table-container tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .data-tables {
+        flex-direction: column; /* Stack tables vertically on smaller screens */
+    }
+
+    .table-container {
+        max-width: 100%; /* Full width for smaller screens */
+    }
+}
+
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    bottom: 0;
-    margin-bottom: 0px;
-    height: 80px;
 }
 
-/* General Button Styles */
-button, .btn {
-    background-color: #e9374e; /* Primary blue color */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 40%; /* Medium size */
+    max-width: 500px; /* Ensure it doesn't grow too large */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+}
+
+.hidden {
+    display: none; /* Class to hide elements */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+}
+
+.modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.modal-content button {
+    background-color: #007BFF;
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 1rem;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: background-color 0.3s ease;
+    width: 100%; /* Full width button */
 }
 
-button:hover, .btn:hover {
-    background-color: #ff1f1fe8; /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift effect */
+.modal-content button:hover {
+    background-color: #0056b3;
 }
 
-button:active, .btn:active {
-    background-color: #003f7f; /* Even darker blue on click */
-    transform: translateY(0); /* Reset lift effect */
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-button:disabled, .btn:disabled {
-    background-color: #cccccc; /* Gray for disabled state */
-    color: #666666;
-    cursor: not-allowed;
-    box-shadow: none;
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-/* Specific Button Variants */
-.btn-primary {
-    background-color: #007bff;
+/* Popup Styles */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-danger {
-    background-color: #f44336; /* Red for danger actions */
+.popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.btn-danger:hover {
-    background-color: #d32f2f;
+.hidden{
+    display: none; /* Class to hide elements */
 }
 
-.btn-success {
-    background-color: #4CAF50; /* Green for success actions */
+.popup-content p {
+    margin-bottom: 20px;
+    font-size: 1rem;
+    color: #333;
 }
 
-.btn-success:hover {
-    background-color: #388E3C;
+.popup-contentp{
+    /* padding: 20px; */
+    /* border-radius: 10px; */
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.307);
+    background-color: #4caf50; /* Green for success */
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
 }
 
-/* General Media Query for Screens Less Than 850px */
-@media (max-width: 850px) {
-    body{
-        height: 100vh;
-        overflow:auto;
+.popup-content button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+.popup-content button#confirmDelete {
+    background-color: #d9534f; /* Red for delete */
+    color: white;
+}
+
+.popup-content button#confirmDelete:hover {
+    background-color: #c9302c;
+}
+
+.popup-content button#cancelDelete {
+    background-color: #5bc0de; /* Blue for cancel */
+    color: white;
+}
+
+.popup-content button#cancelDelete:hover {
+    background-color: #31b0d5;
+}
+
+/* Notification Popup */
+#notificationPopup {
+    animation: fadeOut 3s forwards; /* Automatically fades out after 3 seconds */
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
     }
-    main {
-        flex-direction: column; /* Switch to column layout */
-        align-items: stretch; /* Ensure items take full width */
+    80% {
+        opacity: 1;
     }
-
-    .expense-form, .expense-table {
-        width: 100%; /* Make the sections take full width */
-        margin: 10px 0; /* Add some spacing between sections */
-    }
-
-    .expense-table {
-        height: auto; /* Allow the table to adjust its height */
-    }
-
-    .expense-table h2 {
-        font-size: 1.2rem; /* Adjust font size for smaller screens */
-    }
-
-    .expense-form h2 {
-        font-size: 1.2rem; /* Adjust font size for smaller screens */
-    }
-
-    .expense-form input, .expense-form button {
-        font-size: 0.9rem; /* Adjust input and button font sizes */
-    }
-
-    footer {
-        position: absolute; /* Ensure footer stays below content */
-        bottom: 0; /* Adjust height for smaller screens */
-        padding: 15px;
-
+    100% {
+        opacity: 0;
+        display: none;
     }
 }
+
