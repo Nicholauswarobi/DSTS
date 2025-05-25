@@ -184,6 +184,20 @@ button.delete-btn:hover {
     width: 250px; /* Set a fixed width for the search input */
 }
 
+
+.search-container {
+    margin-bottom: 10px;
+    text-align: right;
+}
+
+.search-input {
+    padding: 8px;
+    width: 300px;
+    border: 1px solid  #007bff;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
 /* Inventory Table */
 .table-container {
     margin-top: 20px;

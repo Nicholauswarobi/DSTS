@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const revenueElement = document.getElementById('revenue');
     const expensesElement = document.getElementById('expenses');
     const topProductsTableBody = document.getElementById('topProductsTableBody');
+    const stockInMetric = document.getElementById('stockInMetric');
+    const stockOutMetric = document.getElementById('stockOutMetric');
+    const stockInValue = document.getElementById('stockInValue');
+    const stockOutValue = document.getElementById('stockOutValue');
 
     // Fetch metrics from the backend
     function fetchMetrics() {
@@ -20,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 todayProfitElement.textContent = `TSH ${data.profit.toLocaleString()}`;
                 revenueElement.textContent = `TSH ${data.revenue.toLocaleString()}`;
                 expensesElement.textContent = `TSH ${data.expenses.toLocaleString()}`;
+
+                // Update Stock In and Stock Out values
+                stockInValue.textContent = data.stock_in;
+                stockOutValue.textContent = data.stock_out;
             })
             .catch(error => console.error('Error fetching metrics:', error));
     }
@@ -55,6 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchTopProducts();
     }
 
-    // Fetch and update metrics on page load
+    // Navigate to Inventory page when Stock In is clicked
+    stockInMetric.addEventListener('click', () => {
+        window.location.href = '/inventory';
+    });
+
+    // Navigate to Sales page when Stock Out is clicked
+    stockOutMetric.addEventListener('click', () => {
+        window.location.href = '/sales';
+    });
+
+    // Fetch metrics on page load
     fetchMetrics();
 });

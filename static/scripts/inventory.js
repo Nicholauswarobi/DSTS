@@ -332,4 +332,19 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('Please select at least one product to delete.');
         }
     });
+
+    // Search functionality for inventory
+    document.getElementById('inventorySearch').addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#inventoryTable tbody tr');
+
+        rows.forEach(row => {
+            const productName = row.cells[1].textContent.toLowerCase();
+            if (productName.includes(searchValue)) {
+                row.style.display = ''; // Show the row
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+    });
 });

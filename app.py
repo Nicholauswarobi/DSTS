@@ -625,12 +625,22 @@ def get_metrics():
             # Calculate profit
             profit = total_sales - total_cogs - total_expenses
 
+            # Calculate Stock In (total quantity added to inventory)
+            cursor.execute("SELECT SUM(product_quantity) FROM products")
+            stock_in = cursor.fetchone()[0] or 0
+
+            # Calculate Stock Out (total quantity sold)
+            cursor.execute("SELECT SUM(quantity_sold) FROM sales")
+            stock_out = cursor.fetchone()[0] or 0
+
         # Format the data for the frontend
         result = {
             'total_sales': f"{total_sales:,.2f}",
             'profit': f"{profit:,.2f}",
             'expenses': f"{total_expenses:,.2f}",
-            'revenue': f"{total_sales:,.2f}"  # Assuming revenue is the same as total sales
+            'revenue': f"{total_sales:,.2f}",  # Assuming revenue is the same as total sales
+            'stock_in': stock_in,
+            'stock_out': stock_out
         }
 
         return jsonify(result), 200

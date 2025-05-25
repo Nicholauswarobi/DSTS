@@ -307,4 +307,19 @@ document.addEventListener('DOMContentLoaded', () => {
             notification.classList.remove('show');
         }, 3000);
     }
+
+    // Search functionality for sales
+    document.getElementById('salesSearch').addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#pastSalesTable tbody tr');
+
+        rows.forEach(row => {
+            const productName = row.cells[0].textContent.toLowerCase();
+            if (productName.includes(searchValue)) {
+                row.style.display = ''; // Show the row
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+    });
 });
