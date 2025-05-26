@@ -27,13 +27,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
-    padding: 0 5px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    gap: 10px; /* Add spacing between buttons */
 }
 
 .calendar-header h4 {
     margin: 0;
-    font-size: 0.8rem; /* Reduce font size for the title */
+    font-size: 1rem; /* Adjust font size for the title */
     color: #333;
     text-align: center;
     flex-grow: 1;
@@ -42,12 +43,13 @@
     align-items: center;
 }
 
+/* General Button Styling */
 .calendar-header .btn {
     background-color: #007BFF;
     color: white;
     border: none;
-    padding: 4px 8px;
-    font-size: 0.7rem; /* Reduce font size for buttons */
+    padding: 6px 12px;
+    font-size: 0.9rem; /* Adjust font size for buttons */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -55,6 +57,22 @@
 
 .calendar-header .btn:hover {
     background-color: #0056b3;
+}
+
+/* Reset Button Styling */
+.calendar-header .btn-reset {
+    background-color: #28a745; /* Light green background */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calendar-header .btn-reset:hover {
+    background-color: #218838; /* Darker green on hover */
 }
 
 /* Calendar Table */
@@ -86,7 +104,7 @@
 }
 
 .calendar td:hover {
-    background-color: #f0f8ff;
+    background-color: #67b8ff;
 }
 
 .calendar-day {

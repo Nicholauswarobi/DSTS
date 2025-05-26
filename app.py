@@ -1,10 +1,11 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-import MySQLdb
+from mysql.connector import pooling
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -26,23 +27,28 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+# MySQL connection pool configuration
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'database': 'dstsdb',
+    'connection_timeout': 10  # Increase timeout to 10 seconds
+}
+
+connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=10, **db_config)
+
+def get_db_connection():
+    return connection_pool.get_connection()
+
 # Ensure the database exists
-db_connection = MySQLdb.connect(
-    host=app.config['MYSQL_HOST'],
-    user=app.config['MYSQL_USER'],
-    passwd=app.config['MYSQL_PASSWORD']
-)
+db_connection = get_db_connection()
 cursor = db_connection.cursor()
 cursor.execute("CREATE DATABASE IF NOT EXISTS dstsdb")
 db_connection.close()
 
 # Connect to the database
-db = MySQLdb.connect(
-    host=app.config['MYSQL_HOST'],
-    user=app.config['MYSQL_USER'],
-    passwd=app.config['MYSQL_PASSWORD'],
-    db=app.config['MYSQL_DB']
-)
+db = get_db_connection()
 
 # Create tables if they do not exist
 cursor = db.cursor()
@@ -234,27 +240,39 @@ def add_product():
 def inventory():
     try:
         cursor = db.cursor()
-        cursor.execute("SELECT id, product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added FROM products")
+        cursor.execute("""
+            SELECT 
+                id, 
+                product_name, 
+                product_quantity, 
+                product_price, 
+                product_purchase, 
+                manufactured_date, 
+                expired_date, 
+                date_added 
+            FROM products
+        """)
         products = cursor.fetchall()
-    finally:
-        cursor.close()  # Ensure the cursor is closed
+        cursor.close()
 
-    product_list = [
-        {
-            "id": row[0],
-            "productName": row[1],
-            "productQuantity": row[2],
-            "productPrice": float(row[3]),
-            "productPurchase": float(row[4]),
-            "manufacturedDate": row[5].strftime('%Y-%m-%d') if row[5] else '',
-            "expiredDate": row[6].strftime('%Y-%m-%d') if row[6] else '',
-            "dateAdded": row[7].strftime('%Y-%m-%d') if row[7] else ''
-        }
-        for row in products
-    ]
+        product_list = [
+            {
+                "id": row[0],
+                "productName": row[1],
+                "productQuantity": row[2],
+                "productPrice": float(row[3]),
+                "productPurchase": float(row[4]),
+                "manufacturedDate": row[5].strftime('%Y-%m-%d') if row[5] else '',
+                "expiredDate": row[6].strftime('%Y-%m-%d') if row[6] else '',
+                "dateAdded": row[7].strftime('%Y-%m-%d') if row[7] else ''
+            }
+            for row in products
+        ]
 
-    # Pass the product list to the template
-    return render_template('inventory.html', products=product_list)
+        return render_template('inventory.html', products=product_list)
+    except Exception as e:
+        print(f"Error fetching inventory data: {e}")
+        return jsonify({'error': 'An error occurred while fetching inventory data.'}), 500
 
 
 
@@ -402,9 +420,12 @@ def logout():
 @app.route('/get-products', methods=['GET'])
 def get_products():
     try:
-        with db.cursor() as cursor:
-            cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
-            products = cursor.fetchall()
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT product_name, product_quantity, product_price FROM products WHERE product_quantity > 0")
+        products = cursor.fetchall()
+        cursor.close()
+        connection.close()
 
         product_list = [
             {
@@ -473,10 +494,14 @@ def add_sale():
 @app.route('/get-sales', methods=['GET'])
 def get_sales():
     try:
-        cursor = db.cursor()
+        connection = get_db_connection()
+        print("Database connection opened")  # Debugging log
+        cursor = connection.cursor()
+        print("Cursor opened")  # Debugging log
+
         cursor.execute("""
             SELECT 
-                s.id,  -- Include sale ID
+                s.id, 
                 p.product_name, 
                 s.quantity_sold, 
                 s.total_price / s.quantity_sold AS price_per_unit, 
@@ -488,12 +513,16 @@ def get_sales():
             ORDER BY s.sale_date DESC
         """)
         sales = cursor.fetchall()
-        cursor.close()
+        print(f"Query executed, fetched {len(sales)} rows")  # Debugging log
 
-        # Convert the data into a list of dictionaries
+        cursor.close()
+        print("Cursor closed")  # Debugging log
+        connection.close()
+        print("Database connection closed")  # Debugging log
+
         sales_list = [
             {
-                "id": row[0],  # Include sale ID
+                "id": row[0],
                 "productName": row[1],
                 "quantitySold": row[2],
                 "pricePerUnit": float(row[3]),
@@ -605,42 +634,58 @@ def delete_sale(sale_id):
 @app.route('/get-metrics', methods=['GET'])
 def get_metrics():
     try:
-        with db.cursor() as cursor:
-            # Calculate total sales
-            cursor.execute("SELECT SUM(total_price) FROM sales")
-            total_sales = cursor.fetchone()[0] or 0
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
-            # Calculate total cost of goods sold (COGS)
-            cursor.execute("""
-                SELECT SUM(s.quantity_sold * p.product_purchase)
-                FROM sales s
-                JOIN products p ON s.product_id = p.id
-            """)
-            total_cogs = cursor.fetchone()[0] or 0
+        # Calculate total sales
+        cursor.execute("SELECT SUM(total_price) FROM sales")
+        total_sales = cursor.fetchone()
+        total_sales = total_sales[0] if total_sales and total_sales[0] is not None else 0
+        print(f"Total Sales: {total_sales}")  # Debugging log
 
-            # Calculate total expenses
-            cursor.execute("SELECT SUM(amount) FROM expenses")
-            total_expenses = cursor.fetchone()[0] or 0
+        # Calculate total cost of goods sold (COGS)
+        cursor.execute("""
+            SELECT SUM(s.quantity_sold * p.product_purchase)
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+        """)
+        total_cogs = cursor.fetchone()
+        total_cogs = total_cogs[0] if total_cogs and total_cogs[0] is not None else 0
+        print(f"Total COGS: {total_cogs}")  # Debugging log
 
-            # Calculate profit
-            profit = total_sales - total_cogs - total_expenses
+        # Calculate total expenses
+        cursor.execute("SELECT SUM(amount) FROM expenses")
+        total_expenses = cursor.fetchone()
+        total_expenses = total_expenses[0] if total_expenses and total_expenses[0] is not None else 0
+        print(f"Total Expenses: {total_expenses}")  # Debugging log
 
-            # Calculate Stock In (total quantity added to inventory)
-            cursor.execute("SELECT SUM(product_quantity) FROM products")
-            stock_in = cursor.fetchone()[0] or 0
+        # Calculate profit
+        profit = total_sales - total_cogs - total_expenses
+        print(f"Profit: {profit}")  # Debugging log
 
-            # Calculate Stock Out (total quantity sold)
-            cursor.execute("SELECT SUM(quantity_sold) FROM sales")
-            stock_out = cursor.fetchone()[0] or 0
+        # Calculate stock in
+        cursor.execute("SELECT SUM(product_quantity) FROM products")
+        stock_in = cursor.fetchone()
+        stock_in = stock_in[0] if stock_in and stock_in[0] is not None else 0
+        print(f"Stock In: {stock_in}")  # Debugging log
 
-        # Format the data for the frontend
+        # Calculate stock out
+        cursor.execute("SELECT SUM(quantity_sold) FROM sales")
+        stock_out = cursor.fetchone()
+        stock_out = stock_out[0] if stock_out and stock_out[0] is not None else 0
+        print(f"Stock Out: {stock_out}")  # Debugging log
+
+        cursor.close()
+        connection.close()
+
+        # Include revenue in the response (equivalent to total_sales)
         result = {
             'total_sales': f"{total_sales:,.2f}",
             'profit': f"{profit:,.2f}",
             'expenses': f"{total_expenses:,.2f}",
-            'revenue': f"{total_sales:,.2f}",  # Assuming revenue is the same as total sales
             'stock_in': stock_in,
-            'stock_out': stock_out
+            'stock_out': stock_out,
+            'revenue': f"{total_sales:,.2f}"  # Add revenue here
         }
 
         return jsonify(result), 200
@@ -729,6 +774,8 @@ def add_debtor():
     except Exception as e:
         print(f"Error adding debtor: {e}")
         return jsonify({'error': 'An error occurred while adding the debtor.'}), 500
+    
+    
 
 @app.route('/record-payment/<int:debtor_id>', methods=['POST'])
 def record_payment(debtor_id):
@@ -759,10 +806,12 @@ def record_payment(debtor_id):
 @app.route('/get-debtors', methods=['GET'])
 def get_debtors():
     try:
-        cursor = db.cursor()
+        connection = get_db_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT id, customer_name, amount_owed, date_added, last_payment_date, status FROM debtors")
         debtors = cursor.fetchall()
         cursor.close()
+        connection.close()
 
         debtor_list = [
             {
@@ -784,26 +833,20 @@ def get_debtors():
 @app.route('/get-top-products', methods=['GET'])
 def get_top_products():
     try:
- 
-        with db.cursor() as cursor:
-            cursor.execute("""
-                SELECT 
-                    p.product_name, 
-                    SUM(s.quantity_sold) AS total_units_sold, 
-                    SUM(s.total_price) AS total_revenue
-                FROM 
-                    sales s
-                JOIN 
-                    products p ON s.product_id = p.id
-                GROUP BY 
-                    p.product_name
-                ORDER BY 
-                    total_units_sold DESC
-                LIMIT 5
-            """)
-            top_products = cursor.fetchall()
-         
-
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("""
+            SELECT 
+                p.product_name, 
+                SUM(s.quantity_sold) AS total_units_sold, 
+                SUM(s.total_price) AS total_revenue
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            GROUP BY p.product_name
+            ORDER BY total_units_sold DESC
+            LIMIT 5
+        """)
+        top_products = cursor.fetchall()
         result = [
             {
                 "rank": idx + 1,
@@ -813,11 +856,100 @@ def get_top_products():
             }
             for idx, row in enumerate(top_products)
         ]
-  
+        cursor.close()
+        connection.close()
         return jsonify(result), 200
     except Exception as e:
         print(f"Error fetching top products: {e}")
         return jsonify({"error": "Failed to fetch top products"}), 500
+    
+
+@app.route('/get-metrics-by-date', methods=['GET'])
+def get_metrics_by_date():
+    try:
+        selected_date = request.args.get('date')  # Format: YYYY-MM-DD
+
+        # Validate the date format
+        try:
+            datetime.strptime(selected_date, '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'error': 'Invalid date format. Please use YYYY-MM-DD.'}), 400
+
+        cursor = db.cursor()
+
+        # Calculate total sales for the selected date
+        cursor.execute("SELECT SUM(total_price) FROM sales WHERE DATE(sale_date) = %s", (selected_date,))
+        total_sales = cursor.fetchone()
+        total_sales = total_sales[0] if total_sales and total_sales[0] is not None else 0
+
+        # Calculate profit for the selected date
+        cursor.execute("""
+            SELECT SUM(s.quantity_sold * (p.product_price - p.product_purchase))
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            WHERE DATE(s.sale_date) = %s
+        """, (selected_date,))
+        profit = cursor.fetchone()
+        profit = profit[0] if profit and profit[0] is not None else 0
+       
+
+        # Calculate expenses for the selected date
+        cursor.execute("SELECT SUM(amount) FROM expenses WHERE DATE(date) = %s", (selected_date,))
+        total_expenses = cursor.fetchone()
+        total_expenses = total_expenses[0] if total_expenses and total_expenses[0] is not None else 0
+        
+
+        # Calculate stock in for the selected date
+        cursor.execute("SELECT SUM(product_quantity) FROM products WHERE DATE(date_added) = %s", (selected_date,))
+        stock_in = cursor.fetchone()
+        stock_in = stock_in[0] if stock_in and stock_in[0] is not None else 0
+        
+        # Calculate stock out for the selected date
+        cursor.execute("SELECT SUM(quantity_sold) FROM sales WHERE DATE(sale_date) = %s", (selected_date,))
+        stock_out = cursor.fetchone()
+        stock_out = stock_out[0] if stock_out and stock_out[0] is not None else 0
+        
+        # Fetch top products for the selected date
+        cursor.execute("""
+            SELECT 
+                p.product_name, 
+                SUM(s.quantity_sold) AS total_units_sold, 
+                SUM(s.total_price) AS total_revenue
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            WHERE DATE(s.sale_date) = %s
+            GROUP BY p.product_name
+            ORDER BY total_units_sold DESC
+            LIMIT 5
+        """, (selected_date,))
+        top_products = cursor.fetchall()
+       
+
+        cursor.close()
+
+        # Include revenue in the response (equivalent to total_sales)
+        result = {
+            'total_sales': f"{total_sales:,.2f}",
+            'profit': f"{profit:,.2f}",
+            'expenses': f"{total_expenses:,.2f}",
+            'stock_in': stock_in,
+            'stock_out': stock_out,
+            'revenue': f"{total_sales:,.2f}",  # Add revenue here
+            'top_products': [
+                {
+                    'rank': idx + 1,
+                    'product_name': row[0],
+                    'units_sold': row[1],
+                    'revenue': row[2]
+                }
+                for idx, row in enumerate(top_products)
+            ]
+        }
+
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error fetching metrics by date: {e}")
+        return jsonify({'error': 'An error occurred while fetching metrics.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

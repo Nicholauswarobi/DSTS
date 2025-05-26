@@ -74,6 +74,8 @@
                     <h3>Total Stock Out</h3>
                     <p id="stockOutValue">0</p>
                 </div>
+
+
                 <div class="metric">
                     <div class="calendar-container">
                         <label class="calendar-title">Filter by Date</label>
@@ -81,6 +83,7 @@
                             <button id="prevMonth" class="btn">Previous</button>
                             <h4 id="currentMonth">March 2025</h4>
                             <button id="nextMonth" class="btn">Next</button>
+                            <button id="resetToToday" class="btn-reset">Today</button>
                         </div>
                         <table class="calendar">
                             <thead>
@@ -177,139 +180,11 @@
     }
     });
 
-    const calendarBody = document.getElementById('calendarBody');
-    const currentMonth = document.getElementById('currentMonth');
-    const prevMonth = document.getElementById('prevMonth');
-    const nextMonth = document.getElementById('nextMonth');
-
-    let date = new Date();
-
-    const renderCalendar = () => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-
-        // Set the current month name
-        currentMonth.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-
-        // Get the first and last day of the month
-        const firstDay = new Date(year, month, 1).getDay();
-        const lastDate = new Date(year, month + 1, 0).getDate();
-
-        // Clear the calendar body
-        calendarBody.innerHTML = '';
-
-        // Generate calendar rows
-        let day = 1;
-        for (let i = 0; i < 6; i++) {
-            const row = document.createElement('tr');
-
-            for (let j = 0; j < 7; j++) {
-                const cell = document.createElement('td');
-
-                if (i === 0 && j < firstDay) {
-                    // Empty cells before the first day
-                    cell.textContent = '';
-                } else if (day > lastDate) {
-                    // Empty cells after the last day
-                    cell.textContent = '';
-                } else {
-                    // Fill in the day
-                    cell.textContent = day;
-                    cell.classList.add('calendar-day');
-                    cell.addEventListener('click', () => {
-                        alert(`Selected date: ${year}-${month + 1}-${day}`);
-                    });
-                    day++;
-                }
-
-                row.appendChild(cell);
-            }
-
-            calendarBody.appendChild(row);
-        }
-    };
-
-    // Event listeners for navigation buttons
-    prevMonth.addEventListener('click', () => {
-        date.setMonth(date.getMonth() - 1);
-        renderCalendar();
-    });
-
-    nextMonth.addEventListener('click', () => {
-        date.setMonth(date.getMonth() + 1);
-        renderCalendar();
-    });
-
-    // Initial render
-    renderCalendar();
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const profilePic = document.getElementById('profilePic');
-            const profileMenu = document.getElementById('profileMenu');
 
-            // Toggle the visibility of the menu when the profile picture is clicked
-            profilePic.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent click from propagating to the document
-                profileMenu.classList.toggle('hidden');
-            });
-
-            // Close the menu if clicked outside
-            document.addEventListener('click', (event) => {
-                if (!profileMenu.contains(event.target) && event.target !== profilePic) {
-                    profileMenu.classList.add('hidden');
-                }
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const notificationButton = document.getElementById('notificationButton');
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const notificationList = document.getElementById('notificationList');
-
-            // Example stock data
-            const stockData = [
-                { name: 'Electric Drill', quantity: 4 },
-                { name: 'Hammer', quantity: 10 },
-                { name: 'Screwdriver Set', quantity: 3 },
-                { name: 'Paint Bucket', quantity: 6 },
-                { name: 'Measuring Tape', quantity: 2 }
-            ];
-
-            // Populate notifications
-            const populateNotifications = () => {
-                notificationList.innerHTML = ''; // Clear existing notifications
-                stockData.forEach(stock => {
-                    if (stock.quantity <= 5) {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `${stock.name} is low on stock (${stock.quantity} left)`;
-                        notificationList.appendChild(listItem);
-                    }
-                });
-
-                if (notificationList.innerHTML === '') {
-                    const noNotifications = document.createElement('li');
-                    noNotifications.textContent = 'No low stock notifications';
-                    notificationList.appendChild(noNotifications);
-                }
-            };
-
-            // Show/hide notification dropdown
-            notificationButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent click from propagating
-                notificationDropdown.classList.toggle('hidden');
-                populateNotifications(); // Populate notifications when dropdown is opened
-            });
-
-            // Close the dropdown if clicked outside
-            document.addEventListener('click', (event) => {
-                if (!notificationDropdown.contains(event.target) && event.target !== notificationButton) {
-                    notificationDropdown.classList.add('hidden');
-                }
-            });
-        });
-    </script>
         <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+
 </body>
 </html>

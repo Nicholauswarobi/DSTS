@@ -20,12 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 console.log('Metrics data:', data); // Debugging log
+
+                // Check if all metrics are present in the response
+                console.log('Expenses:', data.expenses);
+                console.log('Stock In:', data.stock_in);
+                console.log('Stock Out:', data.stock_out);
+
+                // Update the UI
                 todaySalesElement.textContent = `TSH ${data.total_sales.toLocaleString()}`;
                 todayProfitElement.textContent = `TSH ${data.profit.toLocaleString()}`;
-                revenueElement.textContent = `TSH ${data.revenue.toLocaleString()}`;
+                revenueElement.textContent = `TSH ${data.revenue?.toLocaleString() || '0'}`; // Handle undefined revenue
                 expensesElement.textContent = `TSH ${data.expenses.toLocaleString()}`;
-
-                // Update Stock In and Stock Out values
                 stockInValue.textContent = data.stock_in;
                 stockOutValue.textContent = data.stock_out;
             })
