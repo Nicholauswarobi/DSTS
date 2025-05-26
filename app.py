@@ -951,5 +951,89 @@ def get_metrics_by_date():
         print(f"Error fetching metrics by date: {e}")
         return jsonify({'error': 'An error occurred while fetching metrics.'}), 500
 
+@app.route('/get-chart-data', methods=['GET'])
+def get_chart_data():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Fetch monthly revenue, purchase, profit, and expenses
+        cursor.execute("""
+            SELECT 
+                DATE_FORMAT(sale_date, '%b') AS month,
+                SUM(total_price) AS revenue,
+                SUM(quantity_sold * product_purchase) AS purchase,
+                SUM(total_price) - SUM(quantity_sold * product_purchase) AS profit,
+                (SELECT SUM(amount) FROM expenses WHERE DATE_FORMAT(date, '%b') = DATE_FORMAT(sale_date, '%b')) AS expenses
+            FROM sales
+            JOIN products ON sales.product_id = products.id
+            GROUP BY DATE_FORMAT(sale_date, '%Y-%m')
+            ORDER BY DATE_FORMAT(sale_date, '%Y-%m')
+        """)
+        results = cursor.fetchall()
+
+        labels = [row[0] for row in results]
+        revenue_data = [row[1] for row in results]
+        purchase_data = [row[2] for row in results]
+        profit_data = [row[3] for row in results]
+        expenses_data = [row[4] if row[4] is not None else 0 for row in results]
+
+        cursor.close()
+        connection.close()
+
+        return jsonify({
+            'labels': labels,
+            'revenueData': revenue_data,
+            'purchaseData': purchase_data,
+            'profitData': profit_data,
+            'expensesData': expenses_data,
+        })
+    except Exception as e:
+        print(f"Error fetching chart data: {e}")
+        return jsonify({'error': 'Failed to fetch chart data'}), 500
+
+@app.route('/get-daily-metrics', methods=['GET'])
+def get_daily_metrics():
+    try:
+        month = request.args.get('month')  # Format: YYYY-MM
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Fetch daily metrics for the given month
+        cursor.execute("""
+            SELECT 
+                DATE(sale_date) AS day,
+                SUM(total_price) AS revenue,
+                SUM(quantity_sold * product_purchase) AS purchase,
+                SUM(total_price) - SUM(quantity_sold * product_purchase) AS profit,
+                (SELECT SUM(amount) FROM expenses WHERE DATE(date) = DATE(s.sale_date)) AS expenses
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            WHERE DATE_FORMAT(sale_date, '%Y-%m') = %s
+            GROUP BY DATE(sale_date)
+            ORDER BY DATE(sale_date)
+        """, (month,))
+        results = cursor.fetchall()
+
+        labels = [row[0].strftime('%Y-%m-%d') for row in results]
+        revenue_data = [row[1] for row in results]
+        purchase_data = [row[2] for row in results]
+        profit_data = [row[3] for row in results]
+        expenses_data = [row[4] if row[4] is not None else 0 for row in results]
+
+        cursor.close()
+        connection.close()
+
+        return jsonify({
+            'labels': labels,
+            'revenueData': revenue_data,
+            'purchaseData': purchase_data,
+            'profitData': profit_data,
+            'expensesData': expenses_data,
+        })
+    except Exception as e:
+        print(f"Error fetching daily metrics: {e}")
+        return jsonify({'error': 'Failed to fetch daily metrics'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)

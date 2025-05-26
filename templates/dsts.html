@@ -126,9 +126,17 @@
             </div>
 
             <!-- Center Graph -->
-            <div class="graphs">
-                <h2>Revenue vs Purchase</h2>
-                <canvas id="revenueChart"></canvas>
+            <div class="chart-container">
+                <h2>Daily Metrics Dashboard</h2>
+                <div class="chart-controls">
+                    <label for="chartTypeSelector">Select Chart Type:</label>
+                    <select id="chartTypeSelector" class="chart-type-selector">
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="pie">Pie Chart</option>
+                    </select>
+                </div>
+                <canvas id="dailyMetricsChart"></canvas>
             </div>
         </section>
     </main>
@@ -137,51 +145,10 @@
         <p>&copy; 2025 DSTS. All rights reserved.</p>
     </footer>
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
 
-    const revenueChart = new Chart(ctx, {
-    type: 'bar', // Change to 'line' if you prefer
-    data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [
-        {
-            label: 'Revenue (TSH)',
-            data: [1200, 1500, 1800, 1700, 2000, 2300],
-            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-        },
-        {
-            label: 'Purchase (TSH)',
-            data: [800, 900, 1000, 950, 1100, 1200],
-            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-            borderColor: 'rgba(255, 99, 132, 1)',
-            borderWidth: 1
-        }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-        legend: { position: 'top' },
-        title: {
-            display: true,
-            text: 'Monthly Revenue vs Purchase'
-        }
-        },
-        scales: {
-        y: {
-            beginAtZero: true
-        }
-        }
-    }
-    });
-
-    </script>
-
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <script src="{{ url_for('static', filename='scripts/chart.js') }}"></script>
         <script src="{{ url_for('static', filename='scripts/dashboard.js') }}"></script>
         <script src="{{ url_for('static', filename='scripts/calendar.js') }}"></script>
         <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
