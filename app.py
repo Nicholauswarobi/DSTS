@@ -3,9 +3,11 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from mysql.connector import pooling
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from decimal import Decimal
 # import datetime
 from flask_cors import CORS
 from datetime import datetime
+import mysql.connector
 
 app = Flask(__name__)
 CORS(app)
@@ -36,6 +38,34 @@ db_config = {
     'connection_timeout': 10  # Increase timeout to 10 seconds
 }
 
+# Temporary connection to create the database
+temp_db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'connection_timeout': 10  # Increase timeout to 10 seconds
+}
+
+try:
+    temp_connection = mysql.connector.connect(**temp_db_config)
+    temp_cursor = temp_connection.cursor()
+    temp_cursor.execute("CREATE DATABASE IF NOT EXISTS dstsdb")
+    temp_cursor.close()
+    temp_connection.close()
+    print("Database 'dstsdb' created successfully or already exists.")
+except mysql.connector.Error as err:
+    print(f"Error creating database: {err}")
+
+# Update the database configuration to include the database name
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'database': 'dstsdb',
+    'connection_timeout': 10  # Increase timeout to 10 seconds
+}
+
+# Initialize the connection pool
 connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=10, **db_config)
 
 def get_db_connection():
@@ -44,12 +74,6 @@ def get_db_connection():
     except Exception as e:
         print(f"Error getting DB connection: {e}")
         return None
-
-# Ensure the database exists
-db_connection = get_db_connection()
-cursor = db_connection.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS dstsdb")
-db_connection.close()
 
 # Connect to the database
 db = get_db_connection()
@@ -72,7 +96,7 @@ CREATE TABLE IF NOT EXISTS products (
     product_name VARCHAR(255) NOT NULL,
     product_quantity INT NOT NULL,
     product_price DECIMAL(10, 2) NOT NULL,
-    product_purchase DecIMAL(10, 2) NOT NULL,
+    product_purchase DECIMAL(10, 2) NOT NULL,
     manufactured_date DATE NOT NULL,
     expired_date DATE NOT NULL,
     date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -118,43 +142,53 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS debtors (
 
 
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS inventory_history (
+
+# Create history tables for products, sales, expenses, and debtors
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS inventory_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT NOT NULL,
+    product_id INT,
     action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, edited, deleted)
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,    -- Detailed description of the change
     status VARCHAR(50) NOT NULL,  -- Status (e.g., added, deleted, edited)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-)""")
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+)
+""")
 
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS sales_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    sale_id INT NOT NULL,
+    sale_id INT,
     action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, edited, deleted)
+    quantity_sold INT NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,        
     description TEXT NOT NULL,    -- Detailed description of the change
     status VARCHAR(50) NOT NULL,  -- Status (e.g., completed, edited, deleted)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE
+    FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE SET NULL
 )""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS expenses_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    expense_id INT NOT NULL,
+    expense_id INT,
     action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, deleted)
+    amount DECIMAL(10, 2) NOT NULL,
     description TEXT NOT NULL,    -- Detailed description of the change
     status VARCHAR(50) NOT NULL,  -- Status (e.g., added, deleted)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE
+    FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE SET NULL
 )""")
 cursor.execute("""CREATE TABLE IF NOT EXISTS debtors_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    debtor_id INT NOT NULL,
+    debtor_id INT,
+    amount_owed DECIMAL(10, 2) NOT NULL,        
     action VARCHAR(255) NOT NULL, -- Action performed (e.g., paying, paid)
     description TEXT NOT NULL,    -- Detailed description of the change
     status VARCHAR(50) NOT NULL,  -- Status (e.g., paying, paid)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (debtor_id) REFERENCES debtors(id) ON DELETE CASCADE
+    FOREIGN KEY (debtor_id) REFERENCES debtors(id) ON DELETE SET NULL
 )""")
 
 db.commit()
@@ -263,19 +297,26 @@ def add_product():
         expired_date = data['expiredDate']
         date_added = datetime.now().strftime('%Y-%m-%d')
 
-        # Save the product to the database
         cursor = db.cursor()
         cursor.execute(
             "INSERT INTO products (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, date_added)
         )
+        product_id = cursor.lastrowid
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO inventory_history (product_id, action, quantity, price, description, status) VALUES (%s, %s, %s, %s, %s, %s)",
+            (product_id, 'add', product_quantity, product_price, f"Added product: {product_name}", 'added')
+        )
+
         db.commit()
         cursor.close()
 
         return jsonify({'message': 'Product added successfully!'})
     except Exception as e:
         print(f"Error adding product: {e}")
-        return jsonify({'error': 'An error occurred while adding the product. Please try again.'}), 500
+        return jsonify({'error': 'An error occurred while adding the product.'}), 500
 
 
 
@@ -359,7 +400,6 @@ def financial():
 @app.route('/edit-product/<int:product_id>', methods=['POST'])
 def edit_product(product_id):
     try:
-        # Parse JSON data from the request
         data = request.get_json()
         product_name = data['productName']
         product_quantity = data['productQuantity']
@@ -368,34 +408,59 @@ def edit_product(product_id):
         manufactured_date = data['manufacturedDate']
         expired_date = data['expiredDate']
 
-        # Update the product in the database
         cursor = db.cursor()
-        cursor.execute("""
-            UPDATE products
-            SET product_name = %s, product_quantity = %s, product_price = %s, 
-                product_purchase = %s, manufactured_date = %s, expired_date = %s
-            WHERE id = %s
-        """, (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, product_id))
+        cursor.execute(
+            "UPDATE products SET product_name = %s, product_quantity = %s, product_price = %s, product_purchase = %s, manufactured_date = %s, expired_date = %s WHERE id = %s",
+            (product_name, product_quantity, product_price, product_purchase, manufactured_date, expired_date, product_id)
+        )
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO inventory_history (product_id, action, description, status) VALUES (%s, %s, %s, %s)",
+            (product_id, 'edit', f"Edited product: {product_name}, Quantity: {product_quantity}, Price: {product_price}", 'edited')
+        )
+
         db.commit()
         cursor.close()
 
         return jsonify({'message': 'Product updated successfully!'})
     except Exception as e:
-        print(f"Error updating product: {e}")  # Debugging log
-        return jsonify({'error': 'An error occurred while updating the product. Please try again.'}), 500
+        print(f"Error updating product: {e}")
+        return jsonify({'error': 'An error occurred while updating the product.'}), 500
 
 
 
 # Route to handle deleting a product
 @app.route('/delete-product/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
-    # Delete the product from the database
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
-    db.commit()
-    cursor.close()
+    try:
+        cursor = db.cursor()
 
-    return jsonify({'message': 'Product deleted successfully!'})
+        # Fetch product details for history
+        cursor.execute("SELECT product_name FROM products WHERE id = %s", (product_id,))
+        product = cursor.fetchone()
+
+        if not product:
+            return jsonify({'error': 'Product not found'}), 404
+
+        product_name = product[0]
+
+        # Delete the product
+        cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO inventory_history (product_id, action, description, status) VALUES (%s, %s, %s, %s)",
+            (product_id, 'delete', f"Deleted product: {product_name}", 'deleted')
+        )
+
+        db.commit()
+        cursor.close()
+
+        return jsonify({'message': 'Product deleted successfully!'})
+    except Exception as e:
+        print(f"Error deleting product: {e}")
+        return jsonify({'error': 'An error occurred while deleting the product.'}), 500
 
 
 
@@ -497,42 +562,46 @@ def add_sale():
         price = float(data['price'])
         payment_method = data['paymentMethod']
 
-        # Fetch the product ID and available quantity
         cursor = db.cursor()
+        # Fetch product details by name
         cursor.execute("SELECT id, product_quantity FROM products WHERE product_name = %s", (product_name,))
         product = cursor.fetchone()
 
         if not product:
-            return jsonify({'error': 'Product not found'}), 404
+            return jsonify({'error': f"Product '{product_name}' not found"}), 404
 
         product_id, available_quantity = product
 
-        # Check if the quantity is valid
         if quantity > available_quantity:
             return jsonify({'error': 'Insufficient stock available'}), 400
 
-        # Calculate the total price
         total_price = quantity * price
 
-        # Insert the sale into the sales table
+        # Insert sale record
         cursor.execute(
             "INSERT INTO sales (product_id, quantity_sold, total_price, payment_method) VALUES (%s, %s, %s, %s)",
             (product_id, quantity, total_price, payment_method)
         )
+        sale_id = cursor.lastrowid
 
-        # Update the product quantity in the products table
+        # Update product quantity
         cursor.execute(
             "UPDATE products SET product_quantity = product_quantity - %s WHERE id = %s",
             (quantity, product_id)
         )
 
+        # Record history
+        cursor.execute(
+            "INSERT INTO sales_history (sale_id, action, quantity_sold, total_price, description, status) VALUES (%s, %s, %s, %s, %s, %s)",
+            (sale_id, 'add', quantity, total_price, f"Added sale: Product: {product_name}", 'completed')
+        )      
         db.commit()
         cursor.close()
 
         return jsonify({'message': 'Sale recorded successfully!'})
     except Exception as e:
         print(f"Error recording sale: {e}")
-        return jsonify({'error': 'An error occurred while recording the sale. Please try again.'}), 500
+        return jsonify({'error': 'An error occurred while recording the sale.'}), 500
 
 
 # Route to fetch sales data for the sales page
@@ -647,22 +716,37 @@ def delete_sale(sale_id):
     try:
         cursor = db.cursor()
 
-        # Fetch the sale details to restore product quantity
-        cursor.execute("SELECT product_id, quantity_sold FROM sales WHERE id = %s", (sale_id,))
+        # Check if the sale exists
+        cursor.execute("SELECT id FROM sales WHERE id = %s", (sale_id,))
         sale = cursor.fetchone()
 
         if not sale:
             return jsonify({'error': 'Sale not found'}), 404
 
-        product_id, quantity_sold = sale
+        # Fetch sale details for history
+        cursor.execute("""
+            SELECT s.product_id, s.quantity_sold, s.total_price, p.product_name 
+            FROM sales s
+            JOIN products p ON s.product_id = p.id
+            WHERE s.id = %s
+        """, (sale_id,))
+        sale_details = cursor.fetchone()
 
-        # Delete the sale
+        product_id, quantity_sold, total_price, product_name = sale_details
+
+        # Delete the sale record
         cursor.execute("DELETE FROM sales WHERE id = %s", (sale_id,))
 
-        # Restore the product quantity
+        # Update product quantity
         cursor.execute(
             "UPDATE products SET product_quantity = product_quantity + %s WHERE id = %s",
             (quantity_sold, product_id)
+        )
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO sales_history (sale_id, action, quantity_sold, total_price, description, status) VALUES (%s, %s, %s, %s, %s, %s)",
+            (sale_id, 'delete', quantity_sold, total_price, f"Deleted sale: Product: {product_name}", 'deleted')
         )
 
         db.commit()
@@ -672,8 +756,6 @@ def delete_sale(sale_id):
     except Exception as e:
         print(f"Error deleting sale: {e}")
         return jsonify({'error': 'An error occurred while deleting the sale.'}), 500
-
-
 
 # Flask route to fetch sales data
 @app.route('/get-metrics', methods=['GET'])
@@ -741,21 +823,28 @@ def get_metrics():
 @app.route('/add-expense', methods=['POST'])
 def add_expense():
     try:
-        # Parse JSON data from the request
         data = request.get_json()
-        description = data['description']
-        amount = float(data['amount'])
+        description = data['description']  # Textual description of the expense
+        amount = float(data['amount'])  # Numeric amount of the expense
 
-        # Insert the expense into the database (date will be auto-generated)
         cursor = db.cursor()
+        # Insert into the expenses table
         cursor.execute(
             "INSERT INTO expenses (description, amount) VALUES (%s, %s)",
             (description, amount)
         )
+        expense_id = cursor.lastrowid
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO expenses_history (expense_id, action, description, amount, status) VALUES (%s, %s, %s, %s, %s)",
+            (expense_id, 'add', description, amount, 'added')  # Store amount separately
+        )
+
         db.commit()
         cursor.close()
 
-        return jsonify({'message': 'Expense added successfully!'}), 201
+        return jsonify({'message': 'Expense added successfully!'})
     except Exception as e:
         print(f"Error adding expense: {e}")
         return jsonify({'error': 'An error occurred while adding the expense.'}), 500
@@ -789,10 +878,28 @@ def get_expenses():
 def delete_expense(expense_id):
     try:
         cursor = db.cursor()
+
+        # Fetch expense details for history
+        cursor.execute("SELECT description, amount FROM expenses WHERE id = %s", (expense_id,))
+        expense = cursor.fetchone()
+
+        if not expense:
+            return jsonify({'error': 'Expense not found'}), 404
+
+        description, amount = expense
+
         cursor.execute("DELETE FROM expenses WHERE id = %s", (expense_id,))
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO expenses_history (expense_id, action, description, status) VALUES (%s, %s, %s, %s)",
+            (expense_id, 'delete', f"Deleted expense: {description}, Amount: {amount}", 'deleted')
+        )
+
         db.commit()
         cursor.close()
-        return jsonify({'message': 'Expense deleted successfully!'}), 200
+
+        return jsonify({'message': 'Expense deleted successfully!'})
     except Exception as e:
         print(f"Error deleting expense: {e}")
         return jsonify({'error': 'An error occurred while deleting the expense.'}), 500
@@ -826,47 +933,38 @@ def add_debtor():
 def record_payment(debtor_id):
     try:
         data = request.get_json()
-        payment_amount = float(data['payment_amount'])
+        payment_amount = Decimal(data['payment_amount'])
 
         cursor = db.cursor()
-
-        # Fetch the current amount owed
-        cursor.execute("SELECT amount_owed FROM debtors WHERE id = %s", (debtor_id,))
+        cursor.execute("SELECT customer_name, amount_owed FROM debtors WHERE id = %s", (debtor_id,))
         debtor = cursor.fetchone()
 
         if not debtor:
             return jsonify({'error': 'Debtor not found'}), 404
 
-        # Convert amount_owed to float
-        current_amount_owed = float(debtor[0])
+        customer_name, current_amount_owed = debtor
+        new_amount_owed = max(current_amount_owed - payment_amount, Decimal(0))
 
-        # Calculate the new amount owed
-        new_amount_owed = max(current_amount_owed - payment_amount, 0)
-
-        # Update the debtor's record
-        if new_amount_owed == 0:
-            # If the debt is fully paid, mark as PAID and remove the debtor
+        if new_amount_owed == Decimal(0):
             cursor.execute("DELETE FROM debtors WHERE id = %s", (debtor_id,))
+            status = 'paid'
         else:
-            # Otherwise, update the amount owed and status
             cursor.execute(
-                """
-                UPDATE debtors
-                SET amount_owed = %s,
-                    last_payment_date = CURRENT_TIMESTAMP,
-                    status = 'PENDING'
-                WHERE id = %s
-                """,
+                "UPDATE debtors SET amount_owed = %s, last_payment_date = CURRENT_TIMESTAMP, status = 'PENDING' WHERE id = %s",
                 (new_amount_owed, debtor_id)
             )
+            status = 'paying'
+
+        # Record history
+        cursor.execute(
+            "INSERT INTO debtors_history (debtor_id, action, amount_owed, description, status) VALUES (%s, %s, %s, %s, %s)",
+            (debtor_id, 'payment', new_amount_owed, f"Payment recorded for debtor: {customer_name}, Amount Paid: {payment_amount}", status)
+        )
 
         db.commit()
         cursor.close()
 
-        if new_amount_owed == 0:
-            return jsonify({'message': 'Payment recorded successfully! Debtor fully paid and removed.'}), 200
-        else:
-            return jsonify({'message': 'Payment recorded successfully!'}), 200
+        return jsonify({'message': 'Payment recorded successfully!'})
     except Exception as e:
         print(f"Error recording payment: {e}")
         return jsonify({'error': 'An error occurred while recording the payment.'}), 500
@@ -1074,7 +1172,7 @@ def get_daily_metrics():
                 SUM(total_price) AS revenue,
                 SUM(quantity_sold * product_purchase) AS purchase,
                 SUM(total_price) - SUM(quantity_sold * product_purchase) AS profit,
-                (SELECT SUM(amount) FROM expenses WHERE DATE(date) = DATE(s.sale_date)) AS expenses
+                (SELECT SUM(amount) FROM expenses WHERE DATE(date) = DATE(sale_date)) AS expenses
             FROM sales s
             JOIN products p ON s.product_id = p.id
             WHERE DATE_FORMAT(sale_date, '%Y-%m') = %s
@@ -1120,6 +1218,124 @@ def get_low_stock():
     except Exception as e:
         print(f"Error fetching low stock products: {e}")
         return jsonify({'error': 'An error occurred while fetching low stock products.'}), 500
+
+@app.route('/get-inventory-history', methods=['GET'])
+def get_inventory_history():
+    try:
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT ih.created_at, p.product_name, ih.quantity, ih.price, ih.status
+            FROM inventory_history ih
+            JOIN products p ON ih.product_id = p.id
+            ORDER BY ih.created_at DESC
+        """)
+        inventory_history = cursor.fetchall()
+        cursor.close()
+
+        history_list = [
+            {
+                "created_at": row[0].strftime('%Y-%m-%d %H:%M:%S'),
+                "product_name": row[1],
+                "quantity": row[2],
+                "price": float(row[3]),
+                "status": row[4]
+            }
+            for row in inventory_history
+        ]
+
+        return jsonify(history_list)
+    except Exception as e:
+        print(f"Error fetching inventory history: {e}")
+        return jsonify({'error': 'Failed to fetch inventory history'}), 500
+    
+
+
+@app.route('/get-sales-history', methods=['GET'])
+def get_sales_history():
+    try:
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT sh.created_at, p.product_name, sh.quantity_sold, sh.total_price, sh.status
+            FROM sales_history sh
+            JOIN sales s ON sh.sale_id = s.id
+            JOIN products p ON s.product_id = p.id
+            ORDER BY sh.created_at DESC
+        """)
+        sales_history = cursor.fetchall()
+        cursor.close()
+
+        history_list = [
+            {
+                "created_at": row[0].strftime('%Y-%m-%d %H:%M:%S'),
+                "product_name": row[1],
+                "quantity_sold": row[2],
+                "total_price": float(row[3]),
+                "status": row[4]
+            }
+            for row in sales_history
+        ]
+
+        return jsonify(history_list)
+    except Exception as e:
+        print(f"Error fetching sales history: {e}")
+        return jsonify({'error': 'Failed to fetch sales history'}), 500
+
+@app.route('/get-expenses-history', methods=['GET'])
+def get_expenses_history():
+    try:
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT eh.created_at, e.description, eh.amount, eh.status
+            FROM expenses_history eh
+            JOIN expenses e ON eh.expense_id = e.id
+            ORDER BY eh.created_at DESC
+        """)
+        expenses_history = cursor.fetchall()
+        cursor.close()
+
+        history_list = [
+            {
+                "created_at": row[0].strftime('%Y-%m-%d %H:%M:%S'),
+                "description": row[1],
+                "amount": float(row[2]),
+                "status": row[3]
+            }
+            for row in expenses_history
+        ]
+
+        return jsonify(history_list)
+    except Exception as e:
+        print(f"Error fetching expenses history: {e}")
+        return jsonify({'error': 'Failed to fetch expenses history'}), 500
+    
+
+@app.route('/get-debtors-history', methods=['GET'])
+def get_debtors_history():
+    try:
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT dh.created_at, d.customer_name, dh.amount_owed, dh.status
+            FROM debtors_history dh
+            JOIN debtors d ON dh.debtor_id = d.id
+            ORDER BY dh.created_at DESC
+        """)
+        debtors_history = cursor.fetchall()
+        cursor.close()
+
+        history_list = [
+            {
+                "created_at": row[0].strftime('%Y-%m-%d %H:%M:%S'),
+                "customer_name": row[1],
+                "amount_owed": float(row[2]),
+                "status": row[3]
+            }
+            for row in debtors_history
+        ]
+
+        return jsonify(history_list)
+    except Exception as e:
+        print(f"Error fetching debtors history: {e}")
+        return jsonify({'error': 'Failed to fetch debtors history'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

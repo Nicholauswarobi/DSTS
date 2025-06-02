@@ -22,14 +22,10 @@
             <li><a href="{{ url_for('sales') }}">Sales Recording</a></li>
             <li><a href="{{ url_for('inventory') }}">Inventory Updates</a></li>
             <li><a href="{{ url_for('expenses') }}">Expenses and Debts</a></li>
-
         </ul>
     </nav>
 
     <main>
-        <!-- <h2>Financial Tracking Section</h2>
-        <p>Here you can monitor finances and generate reports.</p> -->
-
         <!-- Notification Section -->
         <div id="notification" class="notification" style="display: none;"></div>
 
@@ -51,6 +47,7 @@
                             <th>Date</th>
                             <th>Item</th>
                             <th>Quantity</th>
+                            <th>Price</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -71,6 +68,7 @@
                             <th>Date</th>
                             <th>Product</th>
                             <th>Quantity</th>
+                            <th>Total Price</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -89,8 +87,28 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Category</th>
+                            <th>Description</th>
                             <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Debtors History Table -->
+        <section class="table-section">
+            <h3>Debtors History</h3>
+            <div class="table-container">
+                <table id="debtors-table" border="1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer Name</th>
+                            <th>Amount Owed</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -107,20 +125,15 @@
     </footer>
 
     <script>
-        const inventoryData = JSON.parse(localStorage.getItem('products')) || [];
-        const salesData = JSON.parse(localStorage.getItem('sales')) || [];
-        const expensesData = JSON.parse(localStorage.getItem('expenses')) || [];
-
-        const showNotification = (message, type) => {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`; // Add type-specific class (e.g., success, error)
-            notification.style.display = 'block';
-
-            // Hide the notification after 3 seconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+        const fetchData = async (endpoint) => {
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching data from ${endpoint}:`, error);
+                return [];
+            }
         };
 
         const populateTable = (tableId, data, columns) => {
@@ -138,23 +151,31 @@
             });
         };
 
-        const refreshTables = () => {
-            populateTable('inventory-table', inventoryData, ['dateAdded', 'productName', 'productQuantity', 'status']);
-            populateTable('sales-table', salesData, ['date', 'productName', 'quantity', 'total']);
-            populateTable('expenses-table', expensesData, ['expenseDate', 'expenseName', 'expenseAmount', 'description']);
+        const refreshTables = async () => {
+            const inventoryData = await fetchData('/get-inventory-history');
+            const salesData = await fetchData('/get-sales-history');
+            const expensesData = await fetchData('/get-expenses-history');
+            const debtorsData = await fetchData('/get-debtors-history');
+
+            populateTable('inventory-table', inventoryData, ['created_at', 'product_name', 'quantity', 'price', 'status']);
+            populateTable('sales-table', salesData, ['created_at', 'product_name', 'quantity_sold', 'total_price', 'status']);
+            populateTable('expenses-table', expensesData, ['created_at', 'description', 'amount', 'status']);
+            populateTable('debtors-table', debtorsData, ['created_at', 'customer_name', 'amount_owed', 'status']);
         };
 
-        document.getElementById('filter-button').addEventListener('click', () => {
+        document.getElementById('filter-button').addEventListener('click', async () => {
             const filterDate = document.getElementById('filter-date').value;
             if (!filterDate) return;
 
-            const filteredInventory = inventoryData.filter(item => item.dateAdded === filterDate);
-            const filteredSales = salesData.filter(sale => sale.date === filterDate);
-            const filteredExpenses = expensesData.filter(expense => expense.expenseDate === filterDate);
+            const inventoryData = await fetchData(`/get-inventory-history?date=${filterDate}`);
+            const salesData = await fetchData(`/get-sales-history?date=${filterDate}`);
+            const expensesData = await fetchData(`/get-expenses-history?date=${filterDate}`);
+            const debtorsData = await fetchData(`/get-debtors-history?date=${filterDate}`);
 
-            populateTable('inventory-table', filteredInventory, ['dateAdded', 'productName', 'productQuantity', 'status']);
-            populateTable('sales-table', filteredSales, ['date', 'productName', 'quantity', 'total']);
-            populateTable('expenses-table', filteredExpenses, ['expenseDate', 'expenseName', 'expenseAmount', 'description']);
+            populateTable('inventory-table', inventoryData, ['created_at', 'product_name', 'quantity', 'price', 'status']);
+            populateTable('sales-table', salesData, ['created_at', 'product_name', 'quantity_sold', 'total_price', 'status']);
+            populateTable('expenses-table', expensesData, ['created_at', 'description', 'amount', 'status']);
+            populateTable('debtors-table', debtorsData, ['created_at', 'customer_name', 'amount_owed', 'status']);
         });
 
         document.getElementById('export-button').addEventListener('click', () => {
@@ -176,10 +197,10 @@
             let currentY = 10;
             currentY = addTableToPDF('Inventory History', 'inventory-table', currentY);
             currentY = addTableToPDF('Sales History', 'sales-table', currentY);
-            addTableToPDF('Expenses History', 'expenses-table', currentY);
+            currentY = addTableToPDF('Expenses History', 'expenses-table', currentY);
+            addTableToPDF('Debtors History', 'debtors-table', currentY);
 
             doc.save('Filtered_Data.pdf');
-            showNotification('PDF exported successfully!', 'success');
         });
 
         // Initial population of tables
