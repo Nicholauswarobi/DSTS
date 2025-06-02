@@ -15,14 +15,21 @@
         <h1>Digital Sales Tracking System (DSTS)</h1>
         <p>Tailored for hardware shops in Dodoma, Tanzania</p>
         <div class="notification-menu">
-            <button id="notificationButton" class="notification-btn">🔔</button>
-            <div class="notification-dropdown hidden" id="notificationDropdown">
-                <h4>Notifications</h4>
-                <ul id="notificationList">
-                    <!-- Notifications will be dynamically added here -->
+            <button id="notificationButton" class="notification-btn">🔔
+                <span id="notificationDot" class="notification-dot hidden"></span>
+            </button>
+        </div>
+
+        <div id="lowStockModal" class="notification-modal hidden">
+            <div class="notification-modal-content">
+                <h3>Low Stock Alert</h3>
+                <ul id="lowStockList">
+                    <!-- Low stock products will be dynamically added here -->
                 </ul>
+                <button id="acceptNotificationBtn" class="close-btn">Accept Notification</button>
             </div>
         </div>
+
         <div class="profile-menu">
             <img src="{{ url_for('static', filename='profilePictures/' + profile_pic) }}" alt="Profile Picture" class="profile-pic" id="profilePic">
             <div class="dropdown-content hidden" id="profileMenu">
@@ -139,11 +146,15 @@
                 <canvas id="dailyMetricsChart"></canvas>
             </div>
         </section>
+
+
+
     </main>
 
     <footer>
         <p>&copy; 2025 DSTS. All rights reserved.</p>
     </footer>
+
 
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

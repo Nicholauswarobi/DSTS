@@ -1337,3 +1337,1465 @@ canvas {
     cursor: pointer;
 }
 
+
+
+.notification-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 3000;
+    width: 300px;
+    max-width: 90%;
+
+}
+
+.hidden {
+    display: none;
+}
+
+.notification-modal-content h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.notification-modal-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.notification-modal-content ul li {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.close-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.close-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Notification Menu */
+.notification-menu {
+    position: absolute; /* Position relative to the header */
+    top: 35px; /* Align vertically with the profile picture */
+    right: 100px; /* Place it just before the profile picture */
+    display: inline-block;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-btn:hover {
+    color: #007bff;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1000;
+    width: 250px;
+    padding: 10px;
+}
+
+.notification-dropdown h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.notification-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.notification-dropdown ul li {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown ul li:hover {
+    background-color: #f9f9f9;
+}
+
+.hidden {
+    display: none;
+}
+
+h3 {
+    color: #419cfd;
+    font-size: 25px;
+    padding-left: 20px;
+
+}
+
+/* Close button for modals */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Edit Product Modal Styles */
+.edit-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+}
+
+.edit-modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* Adjusted margin for better positioning */
+    padding: 20px; /* Reduced padding to decrease height */
+    border-radius: 12px;
+    width: 40%; /* Adjust width as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    animation: slideIn 0.3s ease-in-out; /* Smooth slide-in animation */
+    max-height: 70vh; /* Limit the height to 70% of the viewport */
+    overflow-y: auto; /* Enable scrolling if content exceeds max height */
+}
+
+.edit-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.edit-modal-content label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.edit-modal-content input,
+.edit-modal-content button,
+.edit-modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.edit-modal-content input:focus,
+.edit-modal-content select:focus {
+    outline: none;
+    border-color: #007bff; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.edit-modal-content button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.edit-modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.edit-modal-content button[type="button"] {
+    background-color: #6c757d; /* Cancel button color */
+}
+
+.edit-modal-content button[type="button"]:hover {
+    background-color: #5a6268;
+}
+
+/* Close Button */
+.edit-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-close:hover {
+    color: red;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide-in Animation */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green for success */
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 2000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.notification.error {
+    background-color: #f44336;  
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Edit Sale Modal */
+.edit-sale-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);     
+    display: flex;  
+    justify-content: center;    
+    align-items: center;    
+    z-index: 1050; /* Ensure it appears above other elements */
+    animation: fadeIn 0.3s ease-in-out;     
+}
+
+/* Modal Content */
+.edit-sale-modal-content {
+    background: #ffffff; /* White background for the modal */
+    padding: 30px; /* Add padding for spacing */
+    border-radius: 10px; /* Rounded corners */
+    width: 450px; /* Fixed width */
+    max-width: 90%; /* Ensure it fits smaller screens */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    animation: slideIn 0.3s ease-in-out; /* Smooth slide-in animation */
+    z-index: 1060; /* Ensure the modal content is above the modal background */
+    position: relative; /* For positioning the close button */
+}
+.hidden {
+    display: none;  
+}
+/* Modal Header */
+.edit-sale-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Modal Form Labels */
+.edit-sale-modal-content label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Modal Form Inputs and Buttons */
+.edit-sale-modal-content input,
+.edit-sale-modal-content select,
+.edit-sale-modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Focus Effect for Inputs and Selects */
+.edit-sale-modal-content input:focus,
+.edit-sale-modal-content select:focus {
+    outline: none;
+    border-color: #007bff;  
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Modal Buttons */
+.edit-sale-modal-content button {
+    background-color: #007bff;  
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.edit-sale-modal-content button:hover {
+    background-color: #0056b3;  
+}
+
+/* Cancel Button */
+.edit-sale-modal-content button[type="button"] {
+    background-color: #6c757d;  
+}
+
+.edit-sale-modal-content button[type="button"]:hover {
+    background-color: #5a6268;  
+}
+
+/* Close Button */
+.edit-sale-modal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-sale-modal .close:hover {
+    color: red;     
+}
+
+/* Sales Form Modal */
+.sales-form-modal {
+    display: none;  
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    justify-content: center;    
+    align-items: center;    
+    z-index: 10000; 
+}
+
+.sales-form-modal.hidden {
+    display: none;
+}
+
+.sales-form-modal:not(.hidden) {
+    display: flex;
+}
+
+.sales-form-modal-content {
+    background: #ffffff;      
+    padding: 30px;  
+    border-radius: 10px;    
+    width: 450px;       
+    max-width: 90%;     
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
+    position: relative;
+    z-index: 10001;     
+}
+
+/* Modal Header */
+.sales-form-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Modal Form Inputs and Buttons */
+.sales-form-modal-content input,
+.sales-form-modal-content select,
+.sales-form-modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Focus Effect for Inputs and Selects */
+.sales-form-modal-content input:focus,
+.sales-form-modal-content select:focus {
+    outline: none;
+    border-color: #007bff;  
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Modal Buttons */
+.sales-form-modal-content button {
+    background-color: #007bff;  
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.sales-form-modal-content button:hover {
+    background-color: #0056b3;      
+}
+
+/* Cancel Button */
+.sales-form-modal-content button[type="button"] {
+    background-color: #6c757d;  
+}
+
+.sales-form-modal-content button[type="button"]:hover {
+    background-color: #5a6268;     
+}
+
+/* Sales Notification */
+.sales-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50;      
+    color: #fff;    
+    padding: 20px 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.sales-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+.sales-notification.error {
+    background-color: #f44336;  
+}
+
+/* Delete Sale Modal */
+.delete-sale-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.delete-sale-modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.delete-sale-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.delete-sale-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.confirm-delete-sale-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-delete-sale-btn {
+    background-color: #ccc;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-delete-sale-btn:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-delete-sale-btn:hover {
+    background-color: #b0b0b0;
+}
+
+/* Inventory Notification */
+.inventory-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50;    
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-notification.error {
+    background-color: #f44336;  
+}
+
+.inventory-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+/* Chart Container */
+.chart-container {
+    width: 100%;
+    position: relative;
+    height: 450px;
+
+}
+
+/* Canvas Styling */
+canvas {
+    width: 100% !important; 
+    height: 100% !important; 
+}
+
+
+
+/* Style the dropdown container */
+.chart-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+
+}
+
+/* Style the dropdown label */
+.chart-controls label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #333;
+}
+
+/* Style the dropdown */
+.chart-type-selector {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover and focus effects for the dropdown */
+.chart-type-selector:hover,
+.chart-type-selector:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Ensure the dropdown is responsive */
+.chart-type-selector {
+    max-width: 200px;
+    width: 100%;
+}
+
+
+.table-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #007bff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.table-container input[type="checkbox"]:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.table-container input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.table-container label {
+    font-size: 14px;
+    color: #333;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+
+
+.notification-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 3000;
+    width: 300px;
+    max-width: 90%;
+
+}
+
+.hidden {
+    display: none;
+}
+
+.notification-modal-content h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.notification-modal-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.notification-modal-content ul li {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.close-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.close-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Notification Menu */
+.notification-menu {
+    position: absolute; /* Position relative to the header */
+    top: 35px; /* Align vertically with the profile picture */
+    right: 100px; /* Place it just before the profile picture */
+    display: inline-block;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-btn:hover {
+    color: #007bff;
+}
+
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1000;
+    width: 250px;
+    padding: 10px;
+}
+
+.notification-dropdown h4 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.notification-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.notification-dropdown ul li {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notification-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.notification-dropdown ul li:hover {
+    background-color: #f9f9f9;
+}
+
+.hidden {
+    display: none;
+}
+
+h3 {
+    color: #419cfd;
+    font-size: 25px;
+    padding-left: 20px;
+
+}
+
+/* Close button for modals */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Edit Product Modal Styles */
+.edit-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+}
+
+.edit-modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* Adjusted margin for better positioning */
+    padding: 20px; /* Reduced padding to decrease height */
+    border-radius: 12px;
+    width: 40%; /* Adjust width as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    animation: slideIn 0.3s ease-in-out; /* Smooth slide-in animation */
+    max-height: 70vh; /* Limit the height to 70% of the viewport */
+    overflow-y: auto; /* Enable scrolling if content exceeds max height */
+}
+
+.edit-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.edit-modal-content label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.edit-modal-content input,
+.edit-modal-content button,
+.edit-modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.edit-modal-content input:focus,
+.edit-modal-content select:focus {
+    outline: none;
+    border-color: #007bff; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.edit-modal-content button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.edit-modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.edit-modal-content button[type="button"] {
+    background-color: #6c757d; /* Cancel button color */
+}
+
+.edit-modal-content button[type="button"]:hover {
+    background-color: #5a6268;
+}
+
+/* Close Button */
+.edit-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-close:hover {
+    color: red;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide-in Animation */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green for success */
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 2000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.notification.error {
+    background-color: #f44336;  
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Edit Sale Modal */
+.edit-sale-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);     
+    display: flex;  
+    justify-content: center;    
+    align-items: center;    
+    z-index: 1050; /* Ensure it appears above other elements */
+    animation: fadeIn 0.3s ease-in-out;     
+}
+
+/* Modal Content */
+.edit-sale-modal-content {
+    background: #ffffff; /* White background for the modal */
+    padding: 30px; /* Add padding for spacing */
+    border-radius: 10px; /* Rounded corners */
+    width: 450px; /* Fixed width */
+    max-width: 90%; /* Ensure it fits smaller screens */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    animation: slideIn 0.3s ease-in-out; /* Smooth slide-in animation */
+    z-index: 1060; /* Ensure the modal content is above the modal background */
+    position: relative; /* For positioning the close button */
+}
+.hidden {
+    display: none;  
+}
+/* Modal Header */
+.edit-sale-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Modal Form Labels */
+.edit-sale-modal-content label {
+    display: block;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Modal Form Inputs and Buttons */
+.edit-sale-modal-content input,
+.edit-sale-modal-content select,
+.edit-sale-modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Focus Effect for Inputs and Selects */
+.edit-sale-modal-content input:focus,
+.edit-sale-modal-content select:focus {
+    outline: none;
+    border-color: #007bff;  
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Modal Buttons */
+.edit-sale-modal-content button {
+    background-color: #007bff;  
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.edit-sale-modal-content button:hover {
+    background-color: #0056b3;  
+}
+
+/* Cancel Button */
+.edit-sale-modal-content button[type="button"] {
+    background-color: #6c757d;  
+}
+
+.edit-sale-modal-content button[type="button"]:hover {
+    background-color: #5a6268;  
+}
+
+/* Close Button */
+.edit-sale-modal .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-sale-modal .close:hover {
+    color: red;     
+}
+
+/* Sales Form Modal */
+.sales-form-modal {
+    display: none;  
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    justify-content: center;    
+    align-items: center;    
+    z-index: 10000; 
+}
+
+.sales-form-modal.hidden {
+    display: none;
+}
+
+.sales-form-modal:not(.hidden) {
+    display: flex;
+}
+
+.sales-form-modal-content {
+    background: #ffffff;      
+    padding: 30px;  
+    border-radius: 10px;    
+    width: 450px;       
+    max-width: 90%;     
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);    
+    position: relative;
+    z-index: 10001;     
+}
+
+/* Modal Header */
+.sales-form-modal-content h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Modal Form Inputs and Buttons */
+.sales-form-modal-content input,
+.sales-form-modal-content select,
+.sales-form-modal-content button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Focus Effect for Inputs and Selects */
+.sales-form-modal-content input:focus,
+.sales-form-modal-content select:focus {
+    outline: none;
+    border-color: #007bff;  
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Modal Buttons */
+.sales-form-modal-content button {
+    background-color: #007bff;  
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover Effect for Buttons */
+.sales-form-modal-content button:hover {
+    background-color: #0056b3;      
+}
+
+/* Cancel Button */
+.sales-form-modal-content button[type="button"] {
+    background-color: #6c757d;  
+}
+
+.sales-form-modal-content button[type="button"]:hover {
+    background-color: #5a6268;     
+}
+
+/* Sales Notification */
+.sales-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50;      
+    color: #fff;    
+    padding: 20px 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
+}
+
+.sales-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+.sales-notification.error {
+    background-color: #f44336;  
+}
+
+/* Delete Sale Modal */
+.delete-sale-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.delete-sale-modal.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.delete-sale-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.delete-sale-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.confirm-delete-sale-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancel-delete-sale-btn {
+    background-color: #ccc;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-delete-sale-btn:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-delete-sale-btn:hover {
+    background-color: #b0b0b0;
+}
+
+/* Inventory Notification */
+.inventory-notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50;    
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-notification.error {
+    background-color: #f44336;  
+}
+
+.inventory-notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -40%);
+}
+
+/* Chart Container */
+.chart-container {
+    width: 100%;
+    position: relative;
+    height: 450px;
+
+}
+
+/* Canvas Styling */
+canvas {
+    width: 100% !important; 
+    height: 100% !important; 
+}
+
+
+
+/* Style the dropdown container */
+.chart-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+
+}
+
+/* Style the dropdown label */
+.chart-controls label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #333;
+}
+
+/* Style the dropdown */
+.chart-type-selector {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover and focus effects for the dropdown */
+.chart-type-selector:hover,
+.chart-type-selector:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Ensure the dropdown is responsive */
+.chart-type-selector {
+    max-width: 200px;
+    width: 100%;
+}
+
+
+.table-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #007bff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.table-container input[type="checkbox"]:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.table-container input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.table-container label {
+    font-size: 14px;
+    color: #333;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+
+
+.notification-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000;
+    width: 300px;
+    max-width: 90%;
+    /* display: none; */
+}
+
+.notification-modal.hidden {
+    display: none;
+}
+
+.notification-modal-content h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.notification-modal-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.notification-modal-content ul li {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.close-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.close-btn:hover {
+    background-color: #d32f2f;
+}
+
+
+.notification-dot {
+    position: absolute;
+    top: 5px; /* Adjust position relative to the button */
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: #f44336; /* Red color for the dot */
+    border-radius: 50%;
+    /* display: none;  */
+    z-index: 1000;
+}
+
+.notification-dot.show {
+    display: block; /* Show the dot when there are notifications */
+}

@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from mysql.connector import pooling
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
+# import datetime
 from flask_cors import CORS
 from datetime import datetime
 
@@ -39,7 +39,11 @@ db_config = {
 connection_pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=10, **db_config)
 
 def get_db_connection():
-    return connection_pool.get_connection()
+    try:
+        return connection_pool.get_connection()
+    except Exception as e:
+        print(f"Error getting DB connection: {e}")
+        return None
 
 # Ensure the database exists
 db_connection = get_db_connection()
@@ -110,6 +114,47 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS debtors (
     date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_payment_date TIMESTAMP NULL DEFAULT NULL,
     status VARCHAR(10) DEFAULT 'Pending'
+)""")
+
+
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS inventory_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, edited, deleted)
+    description TEXT NOT NULL,    -- Detailed description of the change
+    status VARCHAR(50) NOT NULL,  -- Status (e.g., added, deleted, edited)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+)""")
+
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS sales_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sale_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, edited, deleted)
+    description TEXT NOT NULL,    -- Detailed description of the change
+    status VARCHAR(50) NOT NULL,  -- Status (e.g., completed, edited, deleted)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE
+)""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS expenses_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    expense_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL, -- Action performed (e.g., added, deleted)
+    description TEXT NOT NULL,    -- Detailed description of the change
+    status VARCHAR(50) NOT NULL,  -- Status (e.g., added, deleted)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE
+)""")
+cursor.execute("""CREATE TABLE IF NOT EXISTS debtors_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    debtor_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL, -- Action performed (e.g., paying, paid)
+    description TEXT NOT NULL,    -- Detailed description of the change
+    status VARCHAR(50) NOT NULL,  -- Status (e.g., paying, paid)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (debtor_id) REFERENCES debtors(id) ON DELETE CASCADE
 )""")
 
 db.commit()
@@ -216,7 +261,7 @@ def add_product():
         product_purchase = data['productPurchase']
         manufactured_date = data['manufacturedDate']
         expired_date = data['expiredDate']
-        date_added = datetime.datetime.now().strftime('%Y-%m-%d')
+        date_added = datetime.now().strftime('%Y-%m-%d')
 
         # Save the product to the database
         cursor = db.cursor()
@@ -784,21 +829,44 @@ def record_payment(debtor_id):
         payment_amount = float(data['payment_amount'])
 
         cursor = db.cursor()
-        # Update the amount owed and set the last payment date
-        cursor.execute(
-            """
-            UPDATE debtors
-            SET amount_owed = GREATEST(amount_owed - %s, 0),
-                last_payment_date = CURRENT_TIMESTAMP,
-                status = CASE WHEN amount_owed - %s <= 0 THEN 'PAID' ELSE 'PENDING' END
-            WHERE id = %s
-            """,
-            (payment_amount, payment_amount, debtor_id)
-        )
+
+        # Fetch the current amount owed
+        cursor.execute("SELECT amount_owed FROM debtors WHERE id = %s", (debtor_id,))
+        debtor = cursor.fetchone()
+
+        if not debtor:
+            return jsonify({'error': 'Debtor not found'}), 404
+
+        # Convert amount_owed to float
+        current_amount_owed = float(debtor[0])
+
+        # Calculate the new amount owed
+        new_amount_owed = max(current_amount_owed - payment_amount, 0)
+
+        # Update the debtor's record
+        if new_amount_owed == 0:
+            # If the debt is fully paid, mark as PAID and remove the debtor
+            cursor.execute("DELETE FROM debtors WHERE id = %s", (debtor_id,))
+        else:
+            # Otherwise, update the amount owed and status
+            cursor.execute(
+                """
+                UPDATE debtors
+                SET amount_owed = %s,
+                    last_payment_date = CURRENT_TIMESTAMP,
+                    status = 'PENDING'
+                WHERE id = %s
+                """,
+                (new_amount_owed, debtor_id)
+            )
+
         db.commit()
         cursor.close()
 
-        return jsonify({'message': 'Payment recorded successfully!'}), 200
+        if new_amount_owed == 0:
+            return jsonify({'message': 'Payment recorded successfully! Debtor fully paid and removed.'}), 200
+        else:
+            return jsonify({'message': 'Payment recorded successfully!'}), 200
     except Exception as e:
         print(f"Error recording payment: {e}")
         return jsonify({'error': 'An error occurred while recording the payment.'}), 500
@@ -1034,6 +1102,24 @@ def get_daily_metrics():
     except Exception as e:
         print(f"Error fetching daily metrics: {e}")
         return jsonify({'error': 'Failed to fetch daily metrics'}), 500
+
+@app.route('/low-stock', methods=['GET'])
+def get_low_stock():
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT product_name, product_quantity FROM products WHERE product_quantity < 10")
+        low_stock_products = cursor.fetchall()
+        cursor.close()
+
+        product_list = [
+            {"productName": row[0], "productQuantity": row[1]}
+            for row in low_stock_products
+        ]
+
+        return jsonify(product_list), 200
+    except Exception as e:
+        print(f"Error fetching low stock products: {e}")
+        return jsonify({'error': 'An error occurred while fetching low stock products.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
