@@ -66,27 +66,44 @@ document.getElementById('cancelEditProduct').addEventListener('click', () => {
 });
 
 // Delete Product
-deleteProductBtn.addEventListener('click', async () => {
+deleteProductBtn.addEventListener('click', () => {
     const selectedRows = document.querySelectorAll('.selectRow:checked');
     if (selectedRows.length > 0) {
-        const confirmDelete = confirm(`Are you sure you want to delete ${selectedRows.length} product(s)?`);
-        if (confirmDelete) {
-            const productIds = Array.from(selectedRows).map(row => row.closest('tr').dataset.productId);
+        const productIds = Array.from(selectedRows).map(row => row.closest('tr').dataset.productId);
 
+        // Show the confirmation modal
+        const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+        deleteConfirmationModal.style.display = 'block';
+
+        // Handle confirmation button click
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
             try {
                 for (const productId of productIds) {
-                    await fetch(`/delete-product/${productId}`, {
+                    const response = await fetch(`/delete-product/${productId}`, {
                         method: 'DELETE',
                     });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to delete product');
+                    }
                 }
                 showNotification('Product(s) deleted successfully!');
-                populateInventoryTable(); // Refresh the table
+                await populateInventoryTable(); // Refresh the table
             } catch (error) {
-                showNotification('Failed to delete product(s). Please try again.');
+                console.error('Error deleting product:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                deleteConfirmationModal.style.display = 'none'; // Hide the modal
             }
-        }
+        });
+
+        // Handle cancel button click
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            deleteConfirmationModal.style.display = 'none'; // Hide the modal
+        });
     } else {
-        showNotification('Please select at least one product to delete.');
+        showNotification('Please select at least one product to delete.', 'error');
     }
 });
 
@@ -100,7 +117,7 @@ document.addEventListener('change', () => {
 // Populate Inventory Table
 const populateInventoryTable = async () => {
     try {
-        const response = await fetch('/inventory-data'); // Fetch data from the server
+        const response = await fetch(`/inventory-data?timestamp=${Date.now()}`); // Add a timestamp to prevent caching
         if (!response.ok) {
             throw new Error('Failed to fetch inventory data.');
         }
@@ -309,27 +326,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    deleteProductBtn.addEventListener('click', async () => {
+    deleteProductBtn.addEventListener('click', () => {
         const selectedRows = document.querySelectorAll('.selectRow:checked');
         if (selectedRows.length > 0) {
-            const confirmDelete = confirm(`Are you sure you want to delete ${selectedRows.length} product(s)?`);
-            if (confirmDelete) {
-                const productIds = Array.from(selectedRows).map(row => row.closest('tr').dataset.productId);
+            const productIds = Array.from(selectedRows).map(row => row.closest('tr').dataset.productId);
 
+            // Show the confirmation modal
+            const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+            deleteConfirmationModal.style.display = 'block';
+
+            // Handle confirmation button click
+            document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
                 try {
                     for (const productId of productIds) {
-                        await fetch(`/delete-product/${productId}`, {
+                        const response = await fetch(`/delete-product/${productId}`, {
                             method: 'DELETE',
                         });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Failed to delete product');
+                        }
                     }
                     showNotification('Product(s) deleted successfully!');
-                    populateInventoryTable();
+                    await populateInventoryTable(); // Refresh the table
                 } catch (error) {
-                    showNotification('Failed to delete product(s). Please try again.');
+                    console.error('Error deleting product:', error);
+                    showNotification(error.message, 'error');
+                } finally {
+                    deleteConfirmationModal.style.display = 'none'; // Hide the modal
                 }
-            }
+            });
+
+            // Handle cancel button click
+            document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+                deleteConfirmationModal.style.display = 'none'; // Hide the modal
+            });
         } else {
-            showNotification('Please select at least one product to delete.');
+            showNotification('Please select at least one product to delete.', 'error');
         }
     });
 
