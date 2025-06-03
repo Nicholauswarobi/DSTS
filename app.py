@@ -1058,7 +1058,7 @@ def get_top_products():
 @app.route('/get-metrics-by-date', methods=['GET'])
 def get_metrics_by_date():
     try:
-        selected_date = request.args.get('date')  # Format: YYYY-MM-DD
+        selected_date = request.args.get('date') 
 
         # Validate the date format
         try:
@@ -1068,38 +1068,39 @@ def get_metrics_by_date():
 
         cursor = db.cursor()
 
-        # Calculate total sales for the selected date
+        # Fetch total sales for the selected date
         cursor.execute("SELECT SUM(total_price) FROM sales WHERE DATE(sale_date) = %s", (selected_date,))
         total_sales = cursor.fetchone()
         total_sales = total_sales[0] if total_sales and total_sales[0] is not None else 0
 
-        # Calculate profit for the selected date
+        # Fetch total profit (sales - purchase cost) for the selected date
         cursor.execute("""
             SELECT SUM(s.quantity_sold * (p.product_price - p.product_purchase))
             FROM sales s
             JOIN products p ON s.product_id = p.id
             WHERE DATE(s.sale_date) = %s
         """, (selected_date,))
-        profit = cursor.fetchone()
-        profit = profit[0] if profit and profit[0] is not None else 0
-       
+        profit_before_expenses = cursor.fetchone()
+        profit_before_expenses = profit_before_expenses[0] if profit_before_expenses and profit_before_expenses[0] is not None else 0
 
-        # Calculate expenses for the selected date
+        # Fetch total expenses for the selected date
         cursor.execute("SELECT SUM(amount) FROM expenses WHERE DATE(date) = %s", (selected_date,))
         total_expenses = cursor.fetchone()
         total_expenses = total_expenses[0] if total_expenses and total_expenses[0] is not None else 0
-        
 
-        # Calculate stock in for the selected date
+        # Calculate net profit (profit before expenses - expenses)
+        net_profit = profit_before_expenses - total_expenses
+
+        # Fetch stock in for the selected date
         cursor.execute("SELECT SUM(product_quantity) FROM products WHERE DATE(date_added) = %s", (selected_date,))
         stock_in = cursor.fetchone()
         stock_in = stock_in[0] if stock_in and stock_in[0] is not None else 0
-        
-        # Calculate stock out for the selected date
+
+        # Fetch stock out for the selected date
         cursor.execute("SELECT SUM(quantity_sold) FROM sales WHERE DATE(sale_date) = %s", (selected_date,))
         stock_out = cursor.fetchone()
         stock_out = stock_out[0] if stock_out and stock_out[0] is not None else 0
-        
+
         # Fetch top products for the selected date
         cursor.execute("""
             SELECT 
@@ -1114,18 +1115,17 @@ def get_metrics_by_date():
             LIMIT 5
         """, (selected_date,))
         top_products = cursor.fetchall()
-       
 
         cursor.close()
 
-        # Include revenue in the response (equivalent to total_sales)
+        # Prepare the result
         result = {
             'total_sales': f"{total_sales:,.2f}",
-            'profit': f"{profit:,.2f}",
+            'profit': f"{net_profit:,.2f}",
             'expenses': f"{total_expenses:,.2f}",
             'stock_in': stock_in,
             'stock_out': stock_out,
-            'revenue': f"{total_sales:,.2f}",  # Add revenue here
+            'revenue': f"{total_sales:,.2f}",  
             'top_products': [
                 {
                     'rank': idx + 1,
@@ -1141,7 +1141,7 @@ def get_metrics_by_date():
     except Exception as e:
         print(f"Error fetching metrics by date: {e}")
         return jsonify({'error': 'An error occurred while fetching metrics.'}), 500
-
+        
 @app.route('/get-chart-data', methods=['GET'])
 def get_chart_data():
     try:
